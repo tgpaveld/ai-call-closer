@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { FileText, Plus, Save, Trash2 } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface Script {
   id: string;
@@ -53,6 +54,18 @@ export function ScriptEditor() {
   const [scripts, setScripts] = useState<Script[]>(mockScripts);
   const [selectedScript, setSelectedScript] = useState<Script>(mockScripts[0]);
   const [editedContent, setEditedContent] = useState(mockScripts[0].content);
+  const { speak, stop, isLoading, isPlaying } = useTextToSpeech();
+
+  const handleTestCall = () => {
+    // Заменяем переменные на тестовые значения
+    const testText = editedContent
+      .replace(/{имя}/g, "Иван")
+      .replace(/{компания}/g, "ТестКомпани")
+      .replace(/\[Имя агента\]/g, "Алексей")
+      .replace(/\[Название компании\]/g, "AI Caller");
+    
+    speak(testText);
+  };
 
   const handleSave = () => {
     setScripts(scripts.map(s => 
@@ -127,6 +140,25 @@ export function ScriptEditor() {
                 <Save className="w-4 h-4 mr-2" />
                 Сохранить
               </Button>
+              {isPlaying ? (
+                <Button variant="destructive" onClick={stop}>
+                  <Square className="w-4 h-4 mr-2" />
+                  Остановить
+                </Button>
+              ) : (
+                <Button 
+                  variant="glow" 
+                  onClick={handleTestCall}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Phone className="w-4 h-4 mr-2" />
+                  )}
+                  Тестовый звонок
+                </Button>
+              )}
             </div>
           </div>
 
