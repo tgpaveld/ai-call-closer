@@ -2,20 +2,19 @@ import { useState, useRef, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface UseTextToSpeechOptions {
-  lang?: string;
-  rate?: number;
-  pitch?: number;
+  voiceId?: string;
 }
 
 export function useTextToSpeech(options: UseTextToSpeechOptions = {}) {
-  const { lang = "ru-RU", rate = 1, pitch = 1 } = options;
+  const { voiceId = "JBFqnCBsd6RMkjVDRZzb" } = options;
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const stop = useCallback(() => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       setIsPlaying(false);
     }
   }, []);
@@ -30,65 +29,61 @@ export function useTextToSpeech(options: UseTextToSpeechOptions = {}) {
       return;
     }
 
-    if (!window.speechSynthesis) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
-        description: "Ваш браузер не поддерживает синтез речи",
-      });
-      return;
-    }
-
     stop();
     setIsLoading(true);
 
     try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-      
-      // Try to find a Russian voice
-      const voices = window.speechSynthesis.getVoices();
-      const russianVoice = voices.find(voice => voice.lang.startsWith('ru'));
-      if (russianVoice) {
-        utterance.voice = russianVoice;
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text, voiceId }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Ошибка запроса: ${response.status}`);
       }
 
-      utteranceRef.current = utterance;
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
 
-      utterance.onstart = () => {
-        setIsLoading(false);
-        setIsPlaying(true);
-      };
-
-      utterance.onend = () => {
+      audio.onended = () => {
         setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
       };
 
-      utterance.onerror = (event) => {
+      audio.onerror = () => {
         setIsPlaying(false);
-        setIsLoading(false);
-        if (event.error !== 'canceled') {
-          toast({
-            variant: "destructive",
-            title: "Ошибка воспроизведения",
-            description: "Не удалось воспроизвести аудио",
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Ошибка воспроизведения",
+          description: "Не удалось воспроизвести аудио",
+        });
       };
 
-      window.speechSynthesis.speak(utterance);
+      setIsPlaying(true);
+      await audio.play();
     } catch (error) {
       console.error("TTS error:", error);
-      setIsLoading(false);
       toast({
         variant: "destructive",
         title: "Ошибка генерации голоса",
         description: error instanceof Error ? error.message : "Неизвестная ошибка",
       });
+    } finally {
+      setIsLoading(false);
     }
-  }, [lang, rate, pitch, stop]);
+  }, [voiceId, stop]);
 
   return {
     speak,
