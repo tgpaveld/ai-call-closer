@@ -49,7 +49,56 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("ElevenLabs API error:", response.status, errorText);
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+
+      // ElevenLabs sometimes returns 401 for blocked/free-tier usage with a helpful JSON body.
+      // Surface a user-friendly error to the client instead of a generic 500.
+      try {
+        const parsed = JSON.parse(errorText);
+        const status = parsed?.detail?.status as string | undefined;
+        const message = parsed?.detail?.message as string | undefined;
+
+        if (status === "detected_unusual_activity") {
+          return new Response(
+            JSON.stringify({
+              error:
+                "ElevenLabs заблокировал использование Free Tier (detected_unusual_activity). Перейдите на платный план или используйте другой ключ/аккаунт без VPN/прокси.",
+              provider: "elevenlabs",
+              provider_status: response.status,
+              provider_detail: { status, message },
+            }),
+            {
+              status: 402,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({
+            error: `ElevenLabs API error: ${response.status}`,
+            provider: "elevenlabs",
+            provider_status: response.status,
+            provider_body: parsed,
+          }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({
+            error: `ElevenLabs API error: ${response.status}`,
+            provider: "elevenlabs",
+            provider_status: response.status,
+            provider_body_raw: errorText,
+          }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     const audioBuffer = await response.arrayBuffer();
