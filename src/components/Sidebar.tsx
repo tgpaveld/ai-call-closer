@@ -5,7 +5,9 @@ import {
   FileText, 
   Settings, 
   Bot,
-  Table2
+  Table2,
+  GitBranch,
+  MessageSquareWarning
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +21,8 @@ const menuItems = [
   { id: 'clients', label: 'Клиенты', icon: Users },
   { id: 'campaigns', label: 'Кампании', icon: Phone },
   { id: 'scripts', label: 'Скрипты', icon: FileText },
+  { id: 'script-editor', label: 'Редактор скриптов', icon: GitBranch },
+  { id: 'objections', label: 'Возражения', icon: MessageSquareWarning },
   { id: 'ai-agent', label: 'AI Агент', icon: Bot },
   { id: 'sheets', label: 'Google Sheets', icon: Table2 },
   { id: 'settings', label: 'Настройки', icon: Settings },
