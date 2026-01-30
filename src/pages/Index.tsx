@@ -3,6 +3,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { Dashboard } from "@/components/Dashboard";
 import { ClientsTable } from "@/components/ClientsTable";
 import { ScriptEditor } from "@/components/ScriptEditor";
+import { ScriptFlowEditor } from "@/components/ScriptFlowEditor";
+import { ObjectionsLibrary } from "@/components/ObjectionsLibrary";
 import { AIAgent } from "@/components/AIAgent";
 import { CampaignsPage } from "@/components/CampaignsPage";
 import { SheetsIntegration } from "@/components/SheetsIntegration";
@@ -21,6 +23,10 @@ const Index = () => {
         return <CampaignsPage />;
       case 'scripts':
         return <ScriptEditor />;
+      case 'script-editor':
+        return <ScriptFlowEditor />;
+      case 'objections':
+        return <ObjectionsLibrary />;
       case 'ai-agent':
         return <AIAgent />;
       case 'sheets':
