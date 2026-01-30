@@ -54,7 +54,13 @@ export function ScriptEditor() {
   const [scripts, setScripts] = useState<Script[]>(mockScripts);
   const [selectedScript, setSelectedScript] = useState<Script>(mockScripts[0]);
   const [editedContent, setEditedContent] = useState(mockScripts[0].content);
-  const { speak, stop, isLoading, isPlaying } = useTextToSpeech();
+  
+  // Use OpenAI TTS by default now
+  const { speak, stop, isLoading, isPlaying } = useTextToSpeech({
+    provider: "openai",
+    openaiVoice: "onyx", // Male professional voice
+    speed: 1.0
+  });
 
   const handleTestCall = () => {
     // Заменяем переменные на тестовые значения
