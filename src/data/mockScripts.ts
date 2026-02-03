@@ -1,4 +1,5 @@
 import { Script, Objection, ABTest } from '@/types/script';
+import { novatechScript, tradingObjections } from './tradingScript';
 
 export const mockScriptBlocks: Script = {
   id: 'script-1',
@@ -301,6 +302,7 @@ export const mockABTests: ABTest[] = [
 ];
 
 export const scriptsList: Script[] = [
+  novatechScript, // Trading script first (primary)
   mockScriptBlocks,
   {
     id: 'script-2',
@@ -327,3 +329,6 @@ export const scriptsList: Script[] = [
     updatedAt: new Date().toISOString(),
   },
 ];
+
+// Combine all objections
+export const allObjections: Objection[] = [...mockObjections, ...tradingObjections];
