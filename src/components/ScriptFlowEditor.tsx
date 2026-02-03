@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { 
   Plus, 
   Trash2, 
@@ -12,7 +12,8 @@ import {
   Target,
   Phone,
   AlertTriangle,
-  Settings2
+  Settings2,
+  Check
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -21,6 +22,7 @@ import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { Script, ScriptBlock } from "@/types/script";
 import { scriptsList } from "@/data/mockScripts";
+import { toast } from "sonner";
 
 const blockTypeConfig = {
   greeting: { icon: MessageSquare, color: 'bg-blue-500/20 border-blue-500/50 text-blue-400', label: 'Приветствие' },
@@ -112,10 +114,10 @@ interface ConnectionLineProps {
 }
 
 function ConnectionLine({ from, to, scale }: ConnectionLineProps) {
-  const startX = (from.x + 128) * scale; // Center of card (256px / 2)
-  const startY = (from.y + 60) * scale; // Bottom of card approx
+  const startX = (from.x + 128) * scale;
+  const startY = (from.y + 60) * scale;
   const endX = to.x * scale;
-  const endY = (to.y + 30) * scale; // Top center of target card
+  const endY = (to.y + 30) * scale;
 
   const midX = (startX + endX) / 2;
   const path = `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
@@ -133,11 +135,12 @@ function ConnectionLine({ from, to, scale }: ConnectionLineProps) {
 }
 
 export function ScriptFlowEditor() {
-  const [scripts] = useState<Script[]>(scriptsList);
+  const [scripts, setScripts] = useState<Script[]>(scriptsList);
   const [selectedScript, setSelectedScript] = useState<Script>(scriptsList[0]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [scale, setScale] = useState(0.8);
   const [draggedBlock, setDraggedBlock] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const handleBlockDragStart = (blockId: string) => (e: React.DragEvent) => {
@@ -162,6 +165,7 @@ export function ScriptFlowEditor() {
       ),
     }));
     setDraggedBlock(null);
+    setHasUnsavedChanges(true);
   };
 
   const handleCanvasDragOver = (e: React.DragEvent) => {
@@ -172,6 +176,58 @@ export function ScriptFlowEditor() {
     (id: string) => selectedScript.blocks.find((b) => b.id === id),
     [selectedScript.blocks]
   );
+
+  const handleSaveScript = () => {
+    setScripts((prev) =>
+      prev.map((s) => (s.id === selectedScript.id ? selectedScript : s))
+    );
+    setHasUnsavedChanges(false);
+    toast.success("Скрипт сохранён", {
+      description: selectedScript.name,
+      icon: <Check className="w-4 h-4" />,
+    });
+  };
+
+  const handleUpdateScriptName = (name: string) => {
+    setSelectedScript((prev) => ({ ...prev, name }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleUpdateBlock = (blockId: string, updates: Partial<ScriptBlock>) => {
+    setSelectedScript((prev) => ({
+      ...prev,
+      blocks: prev.blocks.map((block) =>
+        block.id === blockId ? { ...block, ...updates } : block
+      ),
+    }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleAddBlock = (type: ScriptBlock['type']) => {
+    const newBlock: ScriptBlock = {
+      id: `block-${Date.now()}`,
+      type,
+      title: blockTypeConfig[type].label,
+      content: 'Введите текст блока...',
+      position: { x: 100, y: 100 + selectedScript.blocks.length * 120 },
+      transitions: [],
+    };
+    setSelectedScript((prev) => ({
+      ...prev,
+      blocks: [...prev.blocks, newBlock],
+    }));
+    setSelectedBlockId(newBlock.id);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleDeleteBlock = (blockId: string) => {
+    setSelectedScript((prev) => ({
+      ...prev,
+      blocks: prev.blocks.filter((b) => b.id !== blockId),
+    }));
+    setSelectedBlockId(null);
+    setHasUnsavedChanges(true);
+  };
 
   const connections = selectedScript.blocks.flatMap((block) =>
     block.transitions.map((transition) => {
@@ -207,9 +263,12 @@ export function ScriptFlowEditor() {
             <Play className="w-4 h-4 mr-2" />
             Тест
           </Button>
-          <Button>
+          <Button onClick={handleSaveScript} disabled={!hasUnsavedChanges}>
             <Save className="w-4 h-4 mr-2" />
             Сохранить
+            {hasUnsavedChanges && (
+              <span className="ml-2 w-2 h-2 rounded-full bg-warning animate-pulse" />
+            )}
           </Button>
         </div>
       </div>
@@ -226,7 +285,11 @@ export function ScriptFlowEditor() {
           {scripts.map((script) => (
             <button
               key={script.id}
-              onClick={() => setSelectedScript(script)}
+              onClick={() => {
+                setSelectedScript(script);
+                setSelectedBlockId(null);
+                setHasUnsavedChanges(false);
+              }}
               className={cn(
                 "w-full text-left p-3 rounded-lg transition-all duration-200",
                 selectedScript.id === script.id
@@ -256,10 +319,15 @@ export function ScriptFlowEditor() {
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
             <Input
               value={selectedScript.name}
+              onChange={(e) => handleUpdateScriptName(e.target.value)}
               className="bg-background/80 backdrop-blur border-border w-64"
-              readOnly
             />
             <Badge variant="secondary">v{selectedScript.version}</Badge>
+            {hasUnsavedChanges && (
+              <Badge variant="outline" className="bg-warning/20 text-warning border-warning/50">
+                Не сохранено
+              </Badge>
+            )}
           </div>
 
           <div
@@ -332,15 +400,19 @@ export function ScriptFlowEditor() {
 
                   <div>
                     <label className="text-xs text-muted-foreground">Название</label>
-                    <Input value={block.title} className="mt-1 bg-secondary" readOnly />
+                    <Input 
+                      value={block.title} 
+                      onChange={(e) => handleUpdateBlock(block.id, { title: e.target.value })}
+                      className="mt-1 bg-secondary" 
+                    />
                   </div>
 
                   <div>
                     <label className="text-xs text-muted-foreground">Текст</label>
                     <textarea
                       value={block.content}
-                      className="mt-1 w-full min-h-[100px] p-2 rounded-lg bg-secondary border border-border text-sm resize-none"
-                      readOnly
+                      onChange={(e) => handleUpdateBlock(block.id, { content: e.target.value })}
+                      className="mt-1 w-full min-h-[100px] p-2 rounded-lg bg-secondary border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
 
@@ -362,7 +434,12 @@ export function ScriptFlowEditor() {
                     </div>
                   </div>
 
-                  <Button variant="destructive" size="sm" className="w-full">
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleDeleteBlock(block.id)}
+                  >
                     <Trash2 className="w-3 h-3 mr-1" />
                     Удалить блок
                   </Button>
@@ -387,6 +464,7 @@ export function ScriptFlowEditor() {
                     variant="outline"
                     size="sm"
                     className={cn("justify-start text-xs", config.color)}
+                    onClick={() => handleAddBlock(type as ScriptBlock['type'])}
                   >
                     <Icon className="w-3 h-3 mr-1" />
                     {config.label}
