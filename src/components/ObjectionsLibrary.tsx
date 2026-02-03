@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { Objection, ObjectionCategory, ObjectionResponse } from "@/types/script";
-import { mockObjections } from "@/data/mockScripts";
+import { allObjections } from "@/data/mockScripts";
 
 const categoryConfig: Record<ObjectionCategory, { icon: React.ElementType; label: string; color: string }> = {
   price: { icon: DollarSign, label: 'Цена', color: 'bg-red-500/20 text-red-400 border-red-500/50' },
@@ -157,7 +157,7 @@ function ObjectionCard({ objection, isExpanded, onToggle }: ObjectionCardProps) 
 }
 
 export function ObjectionsLibrary() {
-  const [objections] = useState<Objection[]>(mockObjections);
+  const [objections] = useState<Objection[]>(allObjections);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ObjectionCategory | 'all'>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
