@@ -134,9 +134,31 @@ function ConnectionLine({ from, to, scale }: ConnectionLineProps) {
   );
 }
 
+const STORAGE_KEY = 'lovable_scripts';
+
+function loadScriptsFromStorage(): Script[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Failed to load scripts from storage:', e);
+  }
+  return scriptsList;
+}
+
+function saveScriptsToStorage(scripts: Script[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(scripts));
+  } catch (e) {
+    console.error('Failed to save scripts to storage:', e);
+  }
+}
+
 export function ScriptFlowEditor() {
-  const [scripts, setScripts] = useState<Script[]>(scriptsList);
-  const [selectedScript, setSelectedScript] = useState<Script>(scriptsList[0]);
+  const [scripts, setScripts] = useState<Script[]>(() => loadScriptsFromStorage());
+  const [selectedScript, setSelectedScript] = useState<Script>(() => loadScriptsFromStorage()[0]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [scale, setScale] = useState(0.8);
   const [draggedBlock, setDraggedBlock] = useState<string | null>(null);
@@ -178,9 +200,11 @@ export function ScriptFlowEditor() {
   );
 
   const handleSaveScript = () => {
-    setScripts((prev) =>
-      prev.map((s) => (s.id === selectedScript.id ? selectedScript : s))
+    const updatedScripts = scripts.map((s) => 
+      s.id === selectedScript.id ? selectedScript : s
     );
+    setScripts(updatedScripts);
+    saveScriptsToStorage(updatedScripts);
     setHasUnsavedChanges(false);
     toast.success("Скрипт сохранён", {
       description: selectedScript.name,
