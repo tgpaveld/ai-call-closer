@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { 
   Plus, 
   Trash2, 
@@ -13,7 +13,8 @@ import {
   Phone,
   AlertTriangle,
   Settings2,
-  Check
+  Check,
+  Loader2
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -21,7 +22,7 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { Script, ScriptBlock } from "@/types/script";
-import { scriptsList } from "@/data/mockScripts";
+import { useScripts } from "@/hooks/useScripts";
 import { toast } from "sonner";
 
 const blockTypeConfig = {
@@ -133,37 +134,22 @@ function ConnectionLine({ from, to, scale }: ConnectionLineProps) {
     />
   );
 }
-
-const STORAGE_KEY = 'lovable_scripts';
-
-function loadScriptsFromStorage(): Script[] {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-  } catch (e) {
-    console.error('Failed to load scripts from storage:', e);
-  }
-  return scriptsList;
-}
-
-function saveScriptsToStorage(scripts: Script[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(scripts));
-  } catch (e) {
-    console.error('Failed to save scripts to storage:', e);
-  }
-}
-
 export function ScriptFlowEditor() {
-  const [scripts, setScripts] = useState<Script[]>(() => loadScriptsFromStorage());
-  const [selectedScript, setSelectedScript] = useState<Script>(() => loadScriptsFromStorage()[0]);
+  const { scripts, loading, saveScript } = useScripts();
+  const [selectedScript, setSelectedScript] = useState<Script | null>(null);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [scale, setScale] = useState(0.8);
   const [draggedBlock, setDraggedBlock] = useState<string | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Set initial selected script when scripts load
+  useEffect(() => {
+    if (scripts.length > 0 && !selectedScript) {
+      setSelectedScript(scripts[0]);
+    }
+  }, [scripts, selectedScript]);
 
   const handleBlockDragStart = (blockId: string) => (e: React.DragEvent) => {
     setDraggedBlock(blockId);
@@ -172,20 +158,20 @@ export function ScriptFlowEditor() {
 
   const handleCanvasDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    if (!draggedBlock || !canvasRef.current) return;
+    if (!draggedBlock || !canvasRef.current || !selectedScript) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / scale;
     const y = (e.clientY - rect.top) / scale;
 
-    setSelectedScript((prev) => ({
+    setSelectedScript((prev) => prev ? ({
       ...prev,
       blocks: prev.blocks.map((block) =>
         block.id === draggedBlock
           ? { ...block, position: { x: Math.max(0, x - 128), y: Math.max(0, y - 30) } }
           : block
       ),
-    }));
+    }) : null);
     setDraggedBlock(null);
     setHasUnsavedChanges(true);
   };
@@ -195,39 +181,43 @@ export function ScriptFlowEditor() {
   };
 
   const getBlockById = useCallback(
-    (id: string) => selectedScript.blocks.find((b) => b.id === id),
-    [selectedScript.blocks]
+    (id: string) => selectedScript?.blocks.find((b) => b.id === id),
+    [selectedScript?.blocks]
   );
 
-  const handleSaveScript = () => {
-    const updatedScripts = scripts.map((s) => 
-      s.id === selectedScript.id ? selectedScript : s
-    );
-    setScripts(updatedScripts);
-    saveScriptsToStorage(updatedScripts);
-    setHasUnsavedChanges(false);
-    toast.success("Скрипт сохранён", {
-      description: selectedScript.name,
-      icon: <Check className="w-4 h-4" />,
-    });
+  const handleSaveScript = async () => {
+    if (!selectedScript) return;
+    
+    setIsSaving(true);
+    const success = await saveScript(selectedScript);
+    setIsSaving(false);
+    
+    if (success) {
+      setHasUnsavedChanges(false);
+      toast.success("Скрипт сохранён", {
+        description: selectedScript.name,
+        icon: <Check className="w-4 h-4" />,
+      });
+    }
   };
 
   const handleUpdateScriptName = (name: string) => {
-    setSelectedScript((prev) => ({ ...prev, name }));
+    setSelectedScript((prev) => prev ? ({ ...prev, name }) : null);
     setHasUnsavedChanges(true);
   };
 
   const handleUpdateBlock = (blockId: string, updates: Partial<ScriptBlock>) => {
-    setSelectedScript((prev) => ({
+    setSelectedScript((prev) => prev ? ({
       ...prev,
       blocks: prev.blocks.map((block) =>
         block.id === blockId ? { ...block, ...updates } : block
       ),
-    }));
+    }) : null);
     setHasUnsavedChanges(true);
   };
 
   const handleAddBlock = (type: ScriptBlock['type']) => {
+    if (!selectedScript) return;
     const newBlock: ScriptBlock = {
       id: `block-${Date.now()}`,
       type,
@@ -236,24 +226,24 @@ export function ScriptFlowEditor() {
       position: { x: 100, y: 100 + selectedScript.blocks.length * 120 },
       transitions: [],
     };
-    setSelectedScript((prev) => ({
+    setSelectedScript((prev) => prev ? ({
       ...prev,
       blocks: [...prev.blocks, newBlock],
-    }));
+    }) : null);
     setSelectedBlockId(newBlock.id);
     setHasUnsavedChanges(true);
   };
 
   const handleDeleteBlock = (blockId: string) => {
-    setSelectedScript((prev) => ({
+    setSelectedScript((prev) => prev ? ({
       ...prev,
       blocks: prev.blocks.filter((b) => b.id !== blockId),
-    }));
+    }) : null);
     setSelectedBlockId(null);
     setHasUnsavedChanges(true);
   };
 
-  const connections = selectedScript.blocks.flatMap((block) =>
+  const connections = selectedScript?.blocks.flatMap((block) =>
     block.transitions.map((transition) => {
       const targetBlock = getBlockById(transition.targetBlockId);
       if (!targetBlock) return null;
@@ -263,7 +253,27 @@ export function ScriptFlowEditor() {
         to: targetBlock.position,
       };
     }).filter(Boolean)
-  );
+  ) || [];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="p-8 h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Загрузка скриптов...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedScript) {
+    return (
+      <div className="p-8 h-full flex items-center justify-center">
+        <p className="text-muted-foreground">Нет доступных скриптов</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 space-y-6 animate-fade-in h-full">
@@ -287,10 +297,14 @@ export function ScriptFlowEditor() {
             <Play className="w-4 h-4 mr-2" />
             Тест
           </Button>
-          <Button onClick={handleSaveScript} disabled={!hasUnsavedChanges}>
-            <Save className="w-4 h-4 mr-2" />
+          <Button onClick={handleSaveScript} disabled={!hasUnsavedChanges || isSaving}>
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
             Сохранить
-            {hasUnsavedChanges && (
+            {hasUnsavedChanges && !isSaving && (
               <span className="ml-2 w-2 h-2 rounded-full bg-warning animate-pulse" />
             )}
           </Button>
