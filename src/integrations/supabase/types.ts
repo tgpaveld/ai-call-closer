@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      scripts: {
+        Row: {
+          ab_test_group: string | null
+          blocks: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          variables: Json
+          version: number
+        }
+        Insert: {
+          ab_test_group?: string | null
+          blocks?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          variables?: Json
+          version?: number
+        }
+        Update: {
+          ab_test_group?: string | null
+          blocks?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          variables?: Json
+          version?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
