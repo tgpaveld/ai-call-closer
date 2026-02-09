@@ -5,6 +5,3 @@ verify_jwt = false
 
 [functions.openai-tts]
 verify_jwt = false
-
-[functions.script-chat]
-verify_jwt = false

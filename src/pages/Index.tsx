@@ -5,7 +5,6 @@ import { ClientsTable } from "@/components/ClientsTable";
 import { ScriptEditor } from "@/components/ScriptEditor";
 import { ScriptFlowEditor } from "@/components/ScriptFlowEditor";
 import { ObjectionsLibrary } from "@/components/ObjectionsLibrary";
-import { ScriptChat } from "@/components/ScriptChat";
 import { AIAgent } from "@/components/AIAgent";
 import { CampaignsPage } from "@/components/CampaignsPage";
 import { SheetsIntegration } from "@/components/SheetsIntegration";
@@ -28,8 +27,6 @@ const Index = () => {
         return <ScriptFlowEditor />;
       case 'objections':
         return <ObjectionsLibrary />;
-      case 'script-chat':
-        return <ScriptChat />;
       case 'ai-agent':
         return <AIAgent />;
       case 'sheets':
