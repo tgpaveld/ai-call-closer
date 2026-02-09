@@ -8,6 +8,3 @@ verify_jwt = false
 
 [functions.script-chat]
 verify_jwt = false
-
-[functions.auto-dialog-cron]
-verify_jwt = false
