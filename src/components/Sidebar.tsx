@@ -7,7 +7,8 @@ import {
   Bot,
   Table2,
   GitBranch,
-  MessageSquareWarning
+  MessageSquareWarning,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const menuItems = [
   { id: 'scripts', label: 'Скрипты', icon: FileText },
   { id: 'script-editor', label: 'Редактор скриптов', icon: GitBranch },
   { id: 'objections', label: 'Возражения', icon: MessageSquareWarning },
+  { id: 'script-chat', label: 'Тест скрипта', icon: MessageCircle },
   { id: 'ai-agent', label: 'AI Агент', icon: Bot },
   { id: 'sheets', label: 'Google Sheets', icon: Table2 },
   { id: 'settings', label: 'Настройки', icon: Settings },
