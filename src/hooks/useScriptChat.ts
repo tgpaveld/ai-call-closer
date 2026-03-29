@@ -95,7 +95,7 @@ async function streamResponse(
   return true;
 }
 
-export function useScriptChat({ scriptContent, objections, mode }: UseScriptChatOptions) {
+export function useScriptChat({ scriptContent, objections, mode, language }: UseScriptChatOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
