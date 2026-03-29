@@ -15,6 +15,7 @@ interface UseScriptChatOptions {
   scriptContent: string;
   objections: { category: string; trigger: string; keywords: string[] }[];
   mode: ChatMode;
+  language: ChatLanguage;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/script-chat`;
