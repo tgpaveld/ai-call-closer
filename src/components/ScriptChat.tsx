@@ -17,7 +17,7 @@ import { Input } from "./ui/input";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
-import { useScriptChat, ChatMessage, ChatMode } from "@/hooks/useScriptChat";
+import { useScriptChat, ChatMessage, ChatMode, ChatLanguage } from "@/hooks/useScriptChat";
 import { useTextScripts } from "@/hooks/useTextScripts";
 import { allObjections } from "@/data/mockScripts";
 import {
@@ -47,6 +47,12 @@ const MODES: { value: ChatMode; label: string; desc: string; icon: React.ReactNo
     desc: "AI играет обе роли и учится",
     icon: <Users className="w-4 h-4" />,
   },
+];
+
+const LANGUAGES: { value: ChatLanguage; label: string; flag: string }[] = [
+  { value: "ru", label: "Русский", flag: "🇷🇺" },
+  { value: "en", label: "English", flag: "🇬🇧" },
+  { value: "uk", label: "Українська", flag: "🇺🇦" },
 ];
 
 function MessageBubble({ message, mode }: { message: ChatMessage; mode: ChatMode }) {
@@ -104,6 +110,7 @@ export function ScriptChat() {
   const { scripts, loading: scriptsLoading } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string>("");
   const [selectedMode, setSelectedMode] = useState<ChatMode>("ai_manager");
+  const [selectedLanguage, setSelectedLanguage] = useState<ChatLanguage>("ru");
   const [inputValue, setInputValue] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +135,7 @@ export function ScriptChat() {
       scriptContent: selectedScript?.content ?? "",
       objections: objectionsData,
       mode: selectedMode,
+      language: selectedLanguage,
     });
 
   useEffect(() => {
@@ -234,7 +242,36 @@ export function ScriptChat() {
                 </div>
               </div>
 
-              {/* Script selector */}
+              {/* Language selector */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground block mb-2">
+                  Язык общения
+                </label>
+                <div className="flex gap-2">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.value}
+                      onClick={() => {
+                        if (chatStarted) {
+                          clearChat();
+                          setInputValue("");
+                        }
+                        setSelectedLanguage(lang.value);
+                      }}
+                      className={cn(
+                        "flex-1 text-center p-2 rounded-lg border transition-all text-sm",
+                        selectedLanguage === lang.value
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border/50 bg-secondary/50 text-muted-foreground hover:border-border"
+                      )}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <p className="text-xs mt-1">{lang.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground block mb-2">
                   Скрипт для теста
