@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_dialog_runs: {
+        Row: {
+          conversation: string
+          created_at: string
+          id: string
+          script_id: string | null
+          script_name: string
+          status: string
+        }
+        Insert: {
+          conversation?: string
+          created_at?: string
+          id?: string
+          script_id?: string | null
+          script_name: string
+          status?: string
+        }
+        Update: {
+          conversation?: string
+          created_at?: string
+          id?: string
+          script_id?: string | null
+          script_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       scripts: {
         Row: {
           ab_test_group: string | null
