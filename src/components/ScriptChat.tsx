@@ -242,7 +242,36 @@ export function ScriptChat() {
                 </div>
               </div>
 
-              {/* Script selector */}
+              {/* Language selector */}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground block mb-2">
+                  Язык общения
+                </label>
+                <div className="flex gap-2">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.value}
+                      onClick={() => {
+                        if (chatStarted) {
+                          clearChat();
+                          setInputValue("");
+                        }
+                        setSelectedLanguage(lang.value);
+                      }}
+                      className={cn(
+                        "flex-1 text-center p-2 rounded-lg border transition-all text-sm",
+                        selectedLanguage === lang.value
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border/50 bg-secondary/50 text-muted-foreground hover:border-border"
+                      )}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <p className="text-xs mt-1">{lang.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground block mb-2">
                   Скрипт для теста
