@@ -138,7 +138,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
       ];
 
       await streamResponse(
-        { messages: apiMessages, scriptContent, objections, mode },
+        { messages: apiMessages, scriptContent, objections, mode, language },
         upsert,
         controller.signal,
       );
@@ -151,7 +151,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
       setIsLoading(false);
       abortRef.current = null;
     }
-  }, [messages, scriptContent, objections, mode]);
+  }, [messages, scriptContent, objections, mode, language]);
 
   const startConversation = useCallback(async () => {
     setMessages([]);
@@ -172,6 +172,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
           scriptContent,
           objections,
           mode,
+          language,
         },
         upsert,
       );
@@ -181,7 +182,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
     } finally {
       setIsLoading(false);
     }
-  }, [scriptContent, objections, mode]);
+  }, [scriptContent, objections, mode, language]);
 
   const continueAutoDialog = useCallback(async () => {
     if (mode !== "ai_auto") return;
@@ -196,7 +197,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
       ];
 
       await streamResponse(
-        { messages: apiMessages, scriptContent, objections, mode },
+        { messages: apiMessages, scriptContent, objections, mode, language },
         upsert,
       );
     } catch (e) {
@@ -205,7 +206,7 @@ export function useScriptChat({ scriptContent, objections, mode, language }: Use
     } finally {
       setIsLoading(false);
     }
-  }, [messages, scriptContent, objections, mode]);
+  }, [messages, scriptContent, objections, mode, language]);
 
   const clearChat = useCallback(() => {
     if (abortRef.current) abortRef.current.abort();
