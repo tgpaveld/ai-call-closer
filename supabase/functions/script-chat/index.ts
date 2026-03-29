@@ -7,6 +7,13 @@ const corsHeaders = {
 };
 
 type ChatMode = "ai_manager" | "ai_client" | "ai_auto";
+type ChatLanguage = "ru" | "en" | "uk";
+
+const LANG_LABELS: Record<ChatLanguage, { name: string; instruction: string }> = {
+  ru: { name: "русский", instruction: "Отвечай ТОЛЬКО на русском языке." },
+  en: { name: "English", instruction: "Reply ONLY in English." },
+  uk: { name: "українська", instruction: "Відповідай ТІЛЬКИ українською мовою." },
+};
 
 function buildObjectionsContext(objections: { category: string; trigger: string; keywords: string[] }[]): string {
   if (!objections || objections.length === 0) return "";
@@ -17,11 +24,14 @@ function buildObjectionsContext(objections: { category: string; trigger: string;
   return ctx;
 }
 
-function buildSystemPrompt(mode: ChatMode, scriptContent: string, objections: any[]): string {
+function buildSystemPrompt(mode: ChatMode, scriptContent: string, objections: any[], language: ChatLanguage): string {
   const objectionsContext = buildObjectionsContext(objections);
+  const langInstruction = LANG_LABELS[language].instruction;
 
   if (mode === "ai_manager") {
     return `Ты играешь роль МЕНЕДЖЕРА ПО ПРОДАЖАМ, который звонит клиенту. Твоя задача — реалистично вести разговор по скрипту, обрабатывать возражения клиента и вести к закрытию сделки.
+
+${langInstruction}
 
 ПРАВИЛА ПОВЕДЕНИЯ:
 1. Следуй скрипту продаж, но адаптируйся к ответам клиента
@@ -45,6 +55,8 @@ ${objectionsContext}
 
   if (mode === "ai_auto") {
     return `Ты симулируешь ПОЛНЫЙ ТЕЛЕФОННЫЙ РАЗГОВОР между менеджером по продажам и клиентом. Ты играешь ОБЕ роли одновременно.
+
+${langInstruction}
 
 ФОРМАТ ОТВЕТА:
 Каждую реплику начинай с метки роли:
@@ -71,8 +83,10 @@ ${objectionsContext}
 Начни разговор с первого звонка менеджера.`;
   }
 
-  // Default: ai_client (original behavior)
+  // Default: ai_client
   return `Ты играешь роль КЛИЕНТА, которому звонит менеджер по продажам. Твоя задача — реалистично имитировать поведение живого клиента во время холодного звонка.
+
+${langInstruction}
 
 ПРАВИЛА ПОВЕДЕНИЯ:
 1. Веди себя как настоящий клиент — иногда заинтересованный, иногда скептичный, иногда занятой
@@ -99,13 +113,13 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, scriptContent, objections, mode = "ai_client" } = await req.json();
+    const { messages, scriptContent, objections, mode = "ai_client", language = "ru" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    console.log("script-chat mode:", mode, "messages:", messages.length);
+    console.log("script-chat mode:", mode, "language:", language, "messages:", messages.length);
 
-    const systemPrompt = buildSystemPrompt(mode as ChatMode, scriptContent, objections);
+    const systemPrompt = buildSystemPrompt(mode as ChatMode, scriptContent, objections, language as ChatLanguage);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -125,20 +139,20 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Слишком много запросов, попробуйте позже" }), {
+        return new Response(JSON.stringify({ error: "Too many requests" }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Требуется пополнение баланса AI" }), {
+        return new Response(JSON.stringify({ error: "Payment required" }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "Ошибка AI" }), {
+      return new Response(JSON.stringify({ error: "AI error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
