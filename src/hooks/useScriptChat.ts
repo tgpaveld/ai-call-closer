@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
 export type ChatMode = "ai_manager" | "ai_client" | "ai_auto";
+export type ChatLanguage = "ru" | "en" | "uk";
 
 export interface ChatMessage {
   id: string;
