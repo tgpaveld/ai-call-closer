@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,28 @@ serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !data?.claims) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { text, voiceId = "JBFqnCBsd6RMkjVDRZzb" } = await req.json();
     const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
 
@@ -18,8 +41,11 @@ serve(async (req) => {
       throw new Error("ELEVENLABS_API_KEY is not configured");
     }
 
-    if (!text) {
-      throw new Error("Text is required");
+    if (!text || typeof text !== "string" || text.length > 5000) {
+      return new Response(
+        JSON.stringify({ error: "Text is required and must be under 5000 characters" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     console.log("Generating TTS for text:", text.substring(0, 100) + "...");
@@ -49,56 +75,10 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("ElevenLabs API error:", response.status, errorText);
-
-      // ElevenLabs sometimes returns 401 for blocked/free-tier usage with a helpful JSON body.
-      // Surface a user-friendly error to the client instead of a generic 500.
-      try {
-        const parsed = JSON.parse(errorText);
-        const status = parsed?.detail?.status as string | undefined;
-        const message = parsed?.detail?.message as string | undefined;
-
-        if (status === "detected_unusual_activity") {
-          return new Response(
-            JSON.stringify({
-              error:
-                "ElevenLabs заблокировал использование Free Tier (detected_unusual_activity). Перейдите на платный план или используйте другой ключ/аккаунт без VPN/прокси.",
-              provider: "elevenlabs",
-              provider_status: response.status,
-              provider_detail: { status, message },
-            }),
-            {
-              status: 402,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        }
-
-        return new Response(
-          JSON.stringify({
-            error: `ElevenLabs API error: ${response.status}`,
-            provider: "elevenlabs",
-            provider_status: response.status,
-            provider_body: parsed,
-          }),
-          {
-            status: 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      } catch {
-        return new Response(
-          JSON.stringify({
-            error: `ElevenLabs API error: ${response.status}`,
-            provider: "elevenlabs",
-            provider_status: response.status,
-            provider_body_raw: errorText,
-          }),
-          {
-            status: 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
+      return new Response(
+        JSON.stringify({ error: "Audio generation failed. Please try again." }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -113,7 +93,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("TTS error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Audio generation failed" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

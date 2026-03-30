@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,28 @@ serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !data?.claims) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { text, voice = "alloy", speed = 1.0 } = await req.json();
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
@@ -18,12 +41,14 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not configured");
     }
 
-    if (!text) {
-      throw new Error("Text is required");
+    if (!text || typeof text !== "string" || text.length > 5000) {
+      return new Response(
+        JSON.stringify({ error: "Text is required and must be under 5000 characters" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     console.log("Generating OpenAI TTS for text:", text.substring(0, 100) + "...");
-    console.log("Voice:", voice, "Speed:", speed);
 
     const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST",
@@ -43,35 +68,10 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("OpenAI TTS API error:", response.status, errorText);
-
-      try {
-        const parsed = JSON.parse(errorText);
-        const errorMessage = parsed?.error?.message || `OpenAI API error: ${response.status}`;
-        
-        return new Response(
-          JSON.stringify({
-            error: errorMessage,
-            provider: "openai",
-            provider_status: response.status,
-          }),
-          {
-            status: response.status === 401 ? 401 : 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      } catch {
-        return new Response(
-          JSON.stringify({
-            error: `OpenAI API error: ${response.status}`,
-            provider: "openai",
-            provider_status: response.status,
-          }),
-          {
-            status: 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
+      return new Response(
+        JSON.stringify({ error: "Audio generation failed. Please try again." }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const audioBuffer = await response.arrayBuffer();
@@ -86,7 +86,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("TTS error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Audio generation failed" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -9,8 +9,10 @@ import {
   GitBranch,
   MessageSquareWarning,
   MessageCircle,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
   activeTab: string;
@@ -31,6 +33,8 @@ const menuItems = [
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+  const { signOut } = useAuth();
+  
   return (
     <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
       <div className="p-6 border-b border-sidebar-border">
@@ -71,7 +75,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         </ul>
       </nav>
       
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-4 border-t border-sidebar-border space-y-3">
         <div className="glass rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
@@ -80,6 +84,13 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           <p className="text-sm font-medium text-foreground">Активен</p>
           <p className="text-xs text-muted-foreground mt-1">Готов к звонкам</p>
         </div>
+        <button
+          onClick={signOut}
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Выйти
+        </button>
       </div>
     </aside>
   );
