@@ -117,7 +117,7 @@ export function useScripts() {
   // Save/update a script
   const saveScript = async (script: Script): Promise<boolean> => {
     try {
-      const dbScript = mapScriptToDb(script);
+      const dbScript = { ...mapScriptToDb(script), user_id: user?.id };
       
       const { error: upsertError } = await supabase
         .from('scripts')
