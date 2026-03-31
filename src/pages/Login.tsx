@@ -69,7 +69,8 @@ const Login = () => {
           </div>
           <CardTitle className="text-2xl text-foreground">AI Caller</CardTitle>
           <CardDescription className="text-muted-foreground">
-            {isLogin ? "Войдите в свой аккаунт" : "Создайте новый аккаунт"}
+            {forgotMode ? "Введите email для сброса пароля" : isLogin ? "Войдите в свой аккаунт" : "Создайте новый аккаунт"}
+          </CardDescription>
           </CardDescription>
         </CardHeader>
         <CardContent>
