@@ -12,7 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [forgotPassword, setForgotPassword] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,7 +20,17 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (forgotMode) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast({
+          title: "Письмо отправлено",
+          description: "Проверьте email для сброса пароля",
+        });
+        setForgotMode(false);
+      } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast({ title: "Вход выполнен успешно" });
