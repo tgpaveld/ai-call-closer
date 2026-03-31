@@ -91,8 +91,7 @@ export function useScripts() {
   // Seed database with initial mock scripts
   const seedScripts = async () => {
     try {
-      const scriptsToInsert = scriptsList.map(mapScriptToDb);
-      
+      const scriptsToInsert = scriptsList.map(s => ({ ...mapScriptToDb(s), user_id: user?.id }));
       const { data, error: insertError } = await supabase
         .from('scripts')
         .insert(scriptsToInsert)
