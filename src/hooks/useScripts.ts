@@ -153,6 +153,7 @@ export function useScripts() {
           is_active: script.isActive,
           version: script.version,
           ab_test_group: script.abTestGroup || null,
+          user_id: user?.id,
         }])
         .select()
         .single();
