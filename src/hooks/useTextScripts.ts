@@ -32,12 +32,13 @@ function mapDbToTextScript(db: DbTextScript): TextScript {
   };
 }
 
-function mapTextScriptToDb(script: TextScript) {
+function mapTextScriptToDb(script: TextScript, userId?: string) {
   return {
     id: script.id,
     name: script.name,
     content: script.content,
     is_active: script.isActive,
+    user_id: userId,
   };
 }
 
