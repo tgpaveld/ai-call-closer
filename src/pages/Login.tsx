@@ -69,8 +69,11 @@ const Login = () => {
           </div>
           <CardTitle className="text-2xl text-foreground">AI Caller</CardTitle>
           <CardDescription className="text-muted-foreground">
-            {forgotMode ? "Введите email для сброса пароля" : isLogin ? "Войдите в свой аккаунт" : "Создайте новый аккаунт"}
-          </CardDescription>
+            {forgotMode
+              ? "Введите email для сброса пароля"
+              : isLogin
+                ? "Войдите в свой аккаунт"
+                : "Создайте новый аккаунт"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -87,31 +90,53 @@ const Login = () => {
                 className="bg-input border-border"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                placeholder="Минимум 6 символов"
-                className="bg-input border-border"
-              />
-            </div>
+            {!forgotMode && (
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  placeholder="Минимум 6 символов"
+                  className="bg-input border-border"
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? "Войти" : "Зарегистрироваться"}
+              {forgotMode
+                ? "Отправить ссылку"
+                : isLogin
+                  ? "Войти"
+                  : "Зарегистрироваться"}
             </Button>
           </form>
-          <div className="mt-4 text-center">
+          <div className="mt-4 text-center space-y-2">
+            {isLogin && !forgotMode && (
+              <button
+                type="button"
+                onClick={() => setForgotMode(true)}
+                className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
+              >
+                Забыли пароль?
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setForgotMode(false);
+                setIsLogin(!isLogin);
+              }}
               className="text-sm text-primary hover:underline"
             >
-              {isLogin ? "Нет аккаунта? Зарегистрируйтесь" : "Уже есть аккаунт? Войти"}
+              {forgotMode
+                ? "Назад к входу"
+                : isLogin
+                  ? "Нет аккаунта? Зарегистрируйтесь"
+                  : "Уже есть аккаунт? Войти"}
             </button>
           </div>
         </CardContent>
