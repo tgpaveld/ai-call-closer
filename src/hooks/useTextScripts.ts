@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface TextScript {
   id: string;
@@ -31,16 +32,18 @@ function mapDbToTextScript(db: DbTextScript): TextScript {
   };
 }
 
-function mapTextScriptToDb(script: TextScript) {
+function mapTextScriptToDb(script: TextScript, userId?: string) {
   return {
     id: script.id,
     name: script.name,
     content: script.content,
     is_active: script.isActive,
+    user_id: userId,
   };
 }
 
 export function useTextScripts() {
+  const { user } = useAuth();
   const [scripts, setScripts] = useState<TextScript[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +72,7 @@ export function useTextScripts() {
     try {
       const { error: upsertError } = await supabase
         .from("text_scripts")
-        .upsert(mapTextScriptToDb(script), { onConflict: "id" });
+        .upsert(mapTextScriptToDb(script, user?.id), { onConflict: "id" });
 
       if (upsertError) throw upsertError;
 

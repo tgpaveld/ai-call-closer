@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Script, ScriptBlock, ScriptVariable } from '@/types/script';
 import { scriptsList } from '@/data/mockScripts';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DbScript {
   id: string;
@@ -46,6 +47,7 @@ function mapScriptToDb(script: Script) {
 }
 
 export function useScripts() {
+  const { user } = useAuth();
   const [scripts, setScripts] = useState<Script[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +91,7 @@ export function useScripts() {
   // Seed database with initial mock scripts
   const seedScripts = async () => {
     try {
-      const scriptsToInsert = scriptsList.map(mapScriptToDb);
-      
+      const scriptsToInsert = scriptsList.map(s => ({ ...mapScriptToDb(s), user_id: user?.id }));
       const { data, error: insertError } = await supabase
         .from('scripts')
         .insert(scriptsToInsert)
@@ -116,7 +117,7 @@ export function useScripts() {
   // Save/update a script
   const saveScript = async (script: Script): Promise<boolean> => {
     try {
-      const dbScript = mapScriptToDb(script);
+      const dbScript = { ...mapScriptToDb(script), user_id: user?.id };
       
       const { error: upsertError } = await supabase
         .from('scripts')
@@ -152,6 +153,7 @@ export function useScripts() {
           is_active: script.isActive,
           version: script.version,
           ab_test_group: script.abTestGroup || null,
+          user_id: user?.id,
         }])
         .select()
         .single();
