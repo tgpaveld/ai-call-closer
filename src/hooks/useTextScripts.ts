@@ -72,7 +72,7 @@ export function useTextScripts() {
     try {
       const { error: upsertError } = await supabase
         .from("text_scripts")
-        .upsert(mapTextScriptToDb(script), { onConflict: "id" });
+        .upsert(mapTextScriptToDb(script, user?.id), { onConflict: "id" });
 
       if (upsertError) throw upsertError;
 
