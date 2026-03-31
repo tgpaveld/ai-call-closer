@@ -42,6 +42,7 @@ function mapTextScriptToDb(script: TextScript) {
 }
 
 export function useTextScripts() {
+  const { user } = useAuth();
   const [scripts, setScripts] = useState<TextScript[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
