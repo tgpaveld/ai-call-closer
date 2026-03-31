@@ -4,7 +4,6 @@ import { Script, ScriptBlock, ScriptVariable } from '@/types/script';
 import { scriptsList } from '@/data/mockScripts';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 
 interface DbScript {
   id: string;
