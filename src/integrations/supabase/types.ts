@@ -22,6 +22,7 @@ export type Database = {
           script_id: string | null
           script_name: string
           status: string
+          user_id: string | null
         }
         Insert: {
           conversation?: string
@@ -30,6 +31,7 @@ export type Database = {
           script_id?: string | null
           script_name: string
           status?: string
+          user_id?: string | null
         }
         Update: {
           conversation?: string
@@ -38,6 +40,7 @@ export type Database = {
           script_id?: string | null
           script_name?: string
           status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -51,6 +54,7 @@ export type Database = {
           is_active: boolean
           name: string
           updated_at: string
+          user_id: string | null
           variables: Json
           version: number
         }
@@ -63,6 +67,7 @@ export type Database = {
           is_active?: boolean
           name: string
           updated_at?: string
+          user_id?: string | null
           variables?: Json
           version?: number
         }
@@ -75,6 +80,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           updated_at?: string
+          user_id?: string | null
           variables?: Json
           version?: number
         }
@@ -88,6 +94,7 @@ export type Database = {
           is_active: boolean
           name: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           content?: string
@@ -96,6 +103,7 @@ export type Database = {
           is_active?: boolean
           name: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           content?: string
@@ -104,6 +112,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
