@@ -86,7 +86,7 @@ export function useScripts() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Seed database with initial mock scripts
   const seedScripts = async () => {
