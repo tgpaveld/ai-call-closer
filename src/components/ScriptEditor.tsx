@@ -32,6 +32,7 @@ export function ScriptEditor() {
   useEffect(() => {
     if (selectedScript) {
       setEditedContent(selectedScript.content);
+      setEditedName(selectedScript.name);
       setHasUnsavedChanges(false);
     }
   }, [selectedScript?.id]);
