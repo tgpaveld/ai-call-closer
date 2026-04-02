@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { TextScript, useTextScripts } from "@/hooks/useTextScripts";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 
 export function ScriptEditor() {
   const { scripts, loading, error, saveScript, createScript, deleteScript } = useTextScripts();
@@ -22,6 +23,7 @@ export function ScriptEditor() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newScriptName, setNewScriptName] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
@@ -86,6 +88,7 @@ export function ScriptEditor() {
     const ok = await deleteScript(selectedScript.id);
     if (ok) {
       setSelectedScriptId(null);
+      setShowDeleteDialog(false);
       toast.success('Скрипт удалён');
     }
   };
@@ -125,6 +128,24 @@ export function ScriptEditor() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить скрипт?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Скрипт «{selectedScript?.name}» будет удалён без возможности восстановления.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="space-y-4">
@@ -191,7 +212,7 @@ export function ScriptEditor() {
                   className="max-w-md bg-secondary border-border text-lg font-medium"
                 />
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" onClick={handleDelete}>
+                  <Button variant="outline" size="icon" onClick={() => setShowDeleteDialog(true)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                   <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving}>
