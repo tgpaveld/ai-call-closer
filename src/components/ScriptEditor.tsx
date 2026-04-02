@@ -88,6 +88,7 @@ export function ScriptEditor() {
     const ok = await deleteScript(selectedScript.id);
     if (ok) {
       setSelectedScriptId(null);
+      setShowDeleteDialog(false);
       toast.success('Скрипт удалён');
     }
   };
