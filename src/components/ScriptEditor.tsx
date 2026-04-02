@@ -129,6 +129,24 @@ export function ScriptEditor() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить скрипт?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Скрипт «{selectedScript?.name}» будет удалён без возможности восстановления.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-muted-foreground px-2">Мои скрипты</h3>
