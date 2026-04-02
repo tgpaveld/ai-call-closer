@@ -116,6 +116,28 @@ export function useTextScripts() {
     }
   }, [seedScripts]);
 
+  const createScript = useCallback(async (name: string): Promise<TextScript | null> => {
+    if (!user) return null;
+    try {
+      const { data, error: insertError } = await supabase
+        .from('text_scripts')
+        .insert({ name, content: '', is_active: false, user_id: user.id })
+        .select()
+        .single();
+      if (insertError) throw insertError;
+      if (data) {
+        const newScript = mapDbToTextScript(data as DbTextScript);
+        setScripts(prev => [newScript, ...prev]);
+        return newScript;
+      }
+      return null;
+    } catch (err) {
+      console.error('Error creating text script:', err);
+      toast.error('Ошибка создания скрипта');
+      return null;
+    }
+  }, [user]);
+
   const saveScript = useCallback(async (script: TextScript): Promise<boolean> => {
     try {
       const { error: upsertError } = await supabase
@@ -134,6 +156,22 @@ export function useTextScripts() {
       return false;
     }
   }, [user]);
+
+  const deleteScript = useCallback(async (scriptId: string): Promise<boolean> => {
+    try {
+      const { error: deleteError } = await supabase
+        .from('text_scripts')
+        .delete()
+        .eq('id', scriptId);
+      if (deleteError) throw deleteError;
+      setScripts(prev => prev.filter(s => s.id !== scriptId));
+      return true;
+    } catch (err) {
+      console.error('Error deleting text script:', err);
+      toast.error('Ошибка удаления скрипта');
+      return false;
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
