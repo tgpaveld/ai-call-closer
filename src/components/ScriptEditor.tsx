@@ -101,11 +101,30 @@ export function ScriptEditor() {
           <h1 className="text-3xl font-bold text-foreground">Скрипты</h1>
           <p className="text-muted-foreground mt-1">Создание и редактирование скриптов для звонков</p>
         </div>
-        <Button>
+        <Button onClick={() => setShowNewDialog(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Новый скрипт
         </Button>
       </div>
+
+      {/* Dialog for new script */}
+      <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Новый скрипт</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Название скрипта"
+            value={newScriptName}
+            onChange={(e) => setNewScriptName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewDialog(false)}>Отмена</Button>
+            <Button onClick={handleCreate} disabled={!newScriptName.trim()}>Создать</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="space-y-4">
