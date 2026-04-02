@@ -201,10 +201,14 @@ export function useScripts() {
     }
   };
 
-  // Load scripts on mount
+  // Load scripts on mount (only when user is available)
   useEffect(() => {
-    loadScripts();
-  }, [loadScripts]);
+    if (user) {
+      loadScripts();
+    } else {
+      setLoading(false);
+    }
+  }, [loadScripts, user]);
 
   return {
     scripts,
