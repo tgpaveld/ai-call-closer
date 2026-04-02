@@ -1,22 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Save, Trash2, Phone, Square, Loader2 } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { TextScript, useTextScripts } from "@/hooks/useTextScripts";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 
 export function ScriptEditor() {
-  const { scripts, loading, error, saveScript } = useTextScripts();
+  const { scripts, loading, error, saveScript, createScript, deleteScript } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string | null>(null);
   const selectedScript = useMemo(
     () => scripts.find((s) => s.id === selectedScriptId) ?? scripts[0] ?? null,
     [scripts, selectedScriptId]
   );
   const [editedContent, setEditedContent] = useState<string>("");
+  const [editedName, setEditedName] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showNewDialog, setShowNewDialog] = useState(false);
+  const [newScriptName, setNewScriptName] = useState("");
 
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
