@@ -1,22 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Save, Trash2, Phone, Square, Loader2 } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { TextScript, useTextScripts } from "@/hooks/useTextScripts";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 
 export function ScriptEditor() {
-  const { scripts, loading, error, saveScript } = useTextScripts();
+  const { scripts, loading, error, saveScript, createScript, deleteScript } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string | null>(null);
   const selectedScript = useMemo(
     () => scripts.find((s) => s.id === selectedScriptId) ?? scripts[0] ?? null,
     [scripts, selectedScriptId]
   );
   const [editedContent, setEditedContent] = useState<string>("");
+  const [editedName, setEditedName] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showNewDialog, setShowNewDialog] = useState(false);
+  const [newScriptName, setNewScriptName] = useState("");
 
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
@@ -27,6 +32,7 @@ export function ScriptEditor() {
   useEffect(() => {
     if (selectedScript) {
       setEditedContent(selectedScript.content);
+      setEditedName(selectedScript.name);
       setHasUnsavedChanges(false);
     }
   }, [selectedScript?.id]);
@@ -54,10 +60,34 @@ export function ScriptEditor() {
     setIsSaving(true);
     const success = await saveScript({
       ...selectedScript,
+      name: editedName,
       content: editedContent,
     } as TextScript);
     setIsSaving(false);
-    if (success) setHasUnsavedChanges(false);
+    if (success) {
+      setHasUnsavedChanges(false);
+      toast.success('Скрипт сохранён');
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!newScriptName.trim()) return;
+    const created = await createScript(newScriptName.trim());
+    if (created) {
+      setSelectedScriptId(created.id);
+      setShowNewDialog(false);
+      setNewScriptName('');
+      toast.success('Скрипт создан');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedScript) return;
+    const ok = await deleteScript(selectedScript.id);
+    if (ok) {
+      setSelectedScriptId(null);
+      toast.success('Скрипт удалён');
+    }
   };
 
   const handleSelectScript = (script: TextScript) => {
@@ -71,11 +101,30 @@ export function ScriptEditor() {
           <h1 className="text-3xl font-bold text-foreground">Скрипты</h1>
           <p className="text-muted-foreground mt-1">Создание и редактирование скриптов для звонков</p>
         </div>
-        <Button>
+        <Button onClick={() => setShowNewDialog(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Новый скрипт
         </Button>
       </div>
+
+      {/* Dialog for new script */}
+      <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Новый скрипт</DialogTitle>
+          </DialogHeader>
+          <Input
+            placeholder="Название скрипта"
+            value={newScriptName}
+            onChange={(e) => setNewScriptName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewDialog(false)}>Отмена</Button>
+            <Button onClick={handleCreate} disabled={!newScriptName.trim()}>Создать</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="space-y-4">
@@ -134,12 +183,15 @@ export function ScriptEditor() {
             <>
               <div className="flex items-center justify-between mb-6">
                 <Input
-                  value={selectedScript.name}
+                  value={editedName}
+                  onChange={(e) => {
+                    setEditedName(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
                   className="max-w-md bg-secondary border-border text-lg font-medium"
-                  readOnly
                 />
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" disabled>
+                  <Button variant="outline" size="icon" onClick={handleDelete}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                   <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving}>
