@@ -183,12 +183,15 @@ export function ScriptEditor() {
             <>
               <div className="flex items-center justify-between mb-6">
                 <Input
-                  value={selectedScript.name}
+                  value={editedName}
+                  onChange={(e) => {
+                    setEditedName(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
                   className="max-w-md bg-secondary border-border text-lg font-medium"
-                  readOnly
                 />
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" disabled>
+                  <Button variant="outline" size="icon" onClick={handleDelete}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                   <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving}>
