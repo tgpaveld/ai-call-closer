@@ -22,6 +22,7 @@ export function ScriptEditor() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newScriptName, setNewScriptName] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
