@@ -185,7 +185,9 @@ export function useTextScripts() {
     scripts,
     loading,
     error,
+    createScript,
     saveScript,
+    deleteScript,
     reloadScripts: loadScripts,
   };
 }
