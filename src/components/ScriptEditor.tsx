@@ -60,10 +60,34 @@ export function ScriptEditor() {
     setIsSaving(true);
     const success = await saveScript({
       ...selectedScript,
+      name: editedName,
       content: editedContent,
     } as TextScript);
     setIsSaving(false);
-    if (success) setHasUnsavedChanges(false);
+    if (success) {
+      setHasUnsavedChanges(false);
+      toast.success('Скрипт сохранён');
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!newScriptName.trim()) return;
+    const created = await createScript(newScriptName.trim());
+    if (created) {
+      setSelectedScriptId(created.id);
+      setShowNewDialog(false);
+      setNewScriptName('');
+      toast.success('Скрипт создан');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedScript) return;
+    const ok = await deleteScript(selectedScript.id);
+    if (ok) {
+      setSelectedScriptId(null);
+      toast.success('Скрипт удалён');
+    }
   };
 
   const handleSelectScript = (script: TextScript) => {
