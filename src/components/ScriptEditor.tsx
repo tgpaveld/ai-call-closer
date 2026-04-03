@@ -93,6 +93,15 @@ export function ScriptEditor() {
     }
   };
 
+  const handleDuplicate = async () => {
+    if (!selectedScript) return;
+    const dup = await duplicateScript(selectedScript);
+    if (dup) {
+      setSelectedScriptId(dup.id);
+      toast.success('Скрипт дублирован');
+    }
+  };
+
   const handleSelectScript = (script: TextScript) => {
     setSelectedScriptId(script.id);
   };
