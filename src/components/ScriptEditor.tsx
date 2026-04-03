@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2 } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2, Copy } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 
 export function ScriptEditor() {
-  const { scripts, loading, error, saveScript, createScript, deleteScript } = useTextScripts();
+  const { scripts, loading, error, saveScript, createScript, deleteScript, duplicateScript } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string | null>(null);
   const selectedScript = useMemo(
     () => scripts.find((s) => s.id === selectedScriptId) ?? scripts[0] ?? null,
@@ -90,6 +90,15 @@ export function ScriptEditor() {
       setSelectedScriptId(null);
       setShowDeleteDialog(false);
       toast.success('Скрипт удалён');
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!selectedScript) return;
+    const dup = await duplicateScript(selectedScript);
+    if (dup) {
+      setSelectedScriptId(dup.id);
+      toast.success('Скрипт дублирован');
     }
   };
 
@@ -212,6 +221,9 @@ export function ScriptEditor() {
                   className="max-w-md bg-secondary border-border text-lg font-medium"
                 />
                 <div className="flex items-center gap-2">
+                  <Button variant="outline" size="icon" onClick={handleDuplicate} title="Дублировать">
+                    <Copy className="w-4 h-4" />
+                  </Button>
                   <Button variant="outline" size="icon" onClick={() => setShowDeleteDialog(true)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>

@@ -157,6 +157,28 @@ export function useTextScripts() {
     }
   }, [user]);
 
+  const duplicateScript = useCallback(async (script: TextScript): Promise<TextScript | null> => {
+    if (!user) return null;
+    try {
+      const { data, error: insertError } = await supabase
+        .from('text_scripts')
+        .insert({ name: `${script.name} (копия)`, content: script.content, is_active: false, user_id: user.id })
+        .select()
+        .single();
+      if (insertError) throw insertError;
+      if (data) {
+        const newScript = mapDbToTextScript(data as DbTextScript);
+        setScripts(prev => [newScript, ...prev]);
+        return newScript;
+      }
+      return null;
+    } catch (err) {
+      console.error('Error duplicating text script:', err);
+      toast.error('Ошибка дублирования скрипта');
+      return null;
+    }
+  }, [user]);
+
   const deleteScript = useCallback(async (scriptId: string): Promise<boolean> => {
     try {
       const { error: deleteError } = await supabase
@@ -187,6 +209,7 @@ export function useTextScripts() {
     error,
     createScript,
     saveScript,
+    duplicateScript,
     deleteScript,
     reloadScripts: loadScripts,
   };
