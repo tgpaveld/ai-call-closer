@@ -221,6 +221,9 @@ export function ScriptEditor() {
                   className="max-w-md bg-secondary border-border text-lg font-medium"
                 />
                 <div className="flex items-center gap-2">
+                  <Button variant="outline" size="icon" onClick={handleDuplicate} title="Дублировать">
+                    <Copy className="w-4 h-4" />
+                  </Button>
                   <Button variant="outline" size="icon" onClick={() => setShowDeleteDialog(true)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
