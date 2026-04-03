@@ -209,6 +209,7 @@ export function useTextScripts() {
     error,
     createScript,
     saveScript,
+    duplicateScript,
     deleteScript,
     reloadScripts: loadScripts,
   };
