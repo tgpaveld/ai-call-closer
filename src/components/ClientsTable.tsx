@@ -86,13 +86,18 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 
 export function ClientsTable() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [clients] = useState<Client[]>(mockClients);
 
-  const filteredClients = clients.filter(client => 
-    `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.phone.includes(searchQuery)
-  );
+  const filteredClients = clients.filter(client => {
+    const matchesSearch =
+      `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.phone.includes(searchQuery) ||
+      (client.comment?.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = filterStatus === 'all' || client.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="p-8 space-y-6 animate-fade-in">
@@ -117,6 +122,25 @@ export function ClientsTable() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-secondary border-border"
             />
+          </div>
+          <div className="flex gap-1 flex-wrap">
+            {[
+              { key: 'all', label: 'Все' },
+              ...Object.entries(statusConfig).map(([key, { label }]) => ({ key, label })),
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setFilterStatus(key)}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  filterStatus === key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                )}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
