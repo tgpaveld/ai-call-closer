@@ -123,6 +123,25 @@ export function ClientsTable() {
               className="pl-10 bg-secondary border-border"
             />
           </div>
+          <div className="flex gap-1 flex-wrap">
+            {[
+              { key: 'all', label: 'Все' },
+              ...Object.entries(statusConfig).map(([key, { label }]) => ({ key, label })),
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setFilterStatus(key)}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  filterStatus === key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
