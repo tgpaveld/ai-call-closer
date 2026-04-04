@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2, Copy } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2, Copy, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
@@ -13,6 +13,20 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 export function ScriptEditor() {
   const { scripts, loading, error, saveScript, createScript, deleteScript, duplicateScript } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("all");
+
+  const filteredScripts = useMemo(() => {
+    return scripts.filter((s) => {
+      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesFilter = filterActive === "all" ||
+        (filterActive === "active" && s.isActive) ||
+        (filterActive === "inactive" && !s.isActive);
+      return matchesSearch && matchesFilter;
+    });
+  }, [scripts, searchQuery, filterActive]);
+
   const selectedScript = useMemo(
     () => scripts.find((s) => s.id === selectedScriptId) ?? scripts[0] ?? null,
     [scripts, selectedScriptId]
@@ -24,7 +38,6 @@ export function ScriptEditor() {
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newScriptName, setNewScriptName] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
       setSelectedScriptId(selectedScript.id);
@@ -160,6 +173,33 @@ export function ScriptEditor() {
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-muted-foreground px-2">Мои скрипты</h3>
 
+          <div className="relative px-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Поиск скриптов..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 bg-secondary border-border h-9 text-sm"
+            />
+          </div>
+
+          <div className="flex gap-1 px-1">
+            {(["all", "active", "inactive"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilterActive(f)}
+                className={cn(
+                  "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
+                  filterActive === f
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                )}
+              >
+                {f === "all" ? "Все" : f === "active" ? "Активные" : "Неактивные"}
+              </button>
+            ))}
+          </div>
+
           {loading ? (
             <div className="p-4 glass rounded-lg flex items-center gap-3 text-muted-foreground">
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -169,13 +209,13 @@ export function ScriptEditor() {
             <div className="p-4 glass rounded-lg text-destructive">
               {error}
             </div>
-          ) : scripts.length === 0 ? (
+          ) : filteredScripts.length === 0 ? (
             <div className="p-4 glass rounded-lg text-muted-foreground">
-              Скриптов пока нет
+              {scripts.length === 0 ? "Скриптов пока нет" : "Ничего не найдено"}
             </div>
           ) : null}
 
-          {scripts.map((script) => (
+          {filteredScripts.map((script) => (
             <button
               key={script.id}
               onClick={() => handleSelectScript(script)}
