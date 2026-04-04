@@ -86,13 +86,18 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 
 export function ClientsTable() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [clients] = useState<Client[]>(mockClients);
 
-  const filteredClients = clients.filter(client => 
-    `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.phone.includes(searchQuery)
-  );
+  const filteredClients = clients.filter(client => {
+    const matchesSearch =
+      `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.phone.includes(searchQuery) ||
+      (client.comment?.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = filterStatus === 'all' || client.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <div className="p-8 space-y-6 animate-fade-in">
