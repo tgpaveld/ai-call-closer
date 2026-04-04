@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2, Copy, Search } from "lucide-react";
+import { FileText, Plus, Save, Trash2, Phone, Square, Loader2, Edit2, Copy, Search, Download } from "lucide-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
@@ -263,6 +263,19 @@ export function ScriptEditor() {
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="icon" onClick={handleDuplicate} title="Дублировать">
                     <Copy className="w-4 h-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => {
+                    if (!selectedScript) return;
+                    const blob = new Blob([selectedScript.content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${selectedScript.name}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    toast.success('Скрипт экспортирован');
+                  }} title="Экспортировать">
+                    <Download className="w-4 h-4" />
                   </Button>
                   <Button variant="outline" size="icon" onClick={() => setShowDeleteDialog(true)}>
                     <Trash2 className="w-4 h-4" />
