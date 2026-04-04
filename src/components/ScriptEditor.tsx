@@ -13,6 +13,20 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 export function ScriptEditor() {
   const { scripts, loading, error, saveScript, createScript, deleteScript, duplicateScript } = useTextScripts();
   const [selectedScriptId, setSelectedScriptId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("all");
+
+  const filteredScripts = useMemo(() => {
+    return scripts.filter((s) => {
+      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesFilter = filterActive === "all" ||
+        (filterActive === "active" && s.isActive) ||
+        (filterActive === "inactive" && !s.isActive);
+      return matchesSearch && matchesFilter;
+    });
+  }, [scripts, searchQuery, filterActive]);
+
   const selectedScript = useMemo(
     () => scripts.find((s) => s.id === selectedScriptId) ?? scripts[0] ?? null,
     [scripts, selectedScriptId]
@@ -24,7 +38,6 @@ export function ScriptEditor() {
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newScriptName, setNewScriptName] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
   useEffect(() => {
     if (selectedScript && selectedScriptId !== selectedScript.id) {
       setSelectedScriptId(selectedScript.id);
