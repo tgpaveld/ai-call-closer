@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          comment: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_call_date: string | null
+          last_name: string
+          messengers: string
+          phone: string
+          social_media: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string
+          created_at?: string
+          email?: string
+          first_name: string
+          id?: string
+          last_call_date?: string | null
+          last_name?: string
+          messengers?: string
+          phone?: string
+          social_media?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_call_date?: string | null
+          last_name?: string
+          messengers?: string
+          phone?: string
+          social_media?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scripts: {
         Row: {
           ab_test_group: string | null
