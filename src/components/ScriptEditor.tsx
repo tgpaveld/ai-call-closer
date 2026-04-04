@@ -264,6 +264,19 @@ export function ScriptEditor() {
                   <Button variant="outline" size="icon" onClick={handleDuplicate} title="Дублировать">
                     <Copy className="w-4 h-4" />
                   </Button>
+                  <Button variant="outline" size="icon" onClick={() => {
+                    if (!selectedScript) return;
+                    const blob = new Blob([selectedScript.content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${selectedScript.name}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    toast.success('Скрипт экспортирован');
+                  }} title="Экспортировать">
+                    <Download className="w-4 h-4" />
+                  </Button>
                   <Button variant="outline" size="icon" onClick={() => setShowDeleteDialog(true)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
