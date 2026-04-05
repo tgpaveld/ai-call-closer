@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, MoreHorizontal, Loader2, Pencil } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
