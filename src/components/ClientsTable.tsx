@@ -111,10 +111,13 @@ export function ClientsTable() {
       </div>
 
       {/* New client dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <Dialog open={showDialog} onOpenChange={(open) => {
+        setShowDialog(open);
+        if (!open) setEditingClient(null);
+      }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Новый клиент</DialogTitle>
+            <DialogTitle>{editingClient ? "Редактировать клиента" : "Новый клиент"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-2 gap-4">
