@@ -104,7 +104,7 @@ export function ClientsTable() {
           <h1 className="text-3xl font-bold text-foreground">Клиенты</h1>
           <p className="text-muted-foreground mt-1">Управление базой клиентов</p>
         </div>
-        <Button onClick={() => setShowDialog(true)}>
+        <Button onClick={openCreateDialog}>
           <Plus className="w-4 h-4 mr-2" />
           Добавить клиента
         </Button>
