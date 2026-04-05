@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, MoreHorizontal, Loader2, Pencil } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -7,8 +7,12 @@ import { Client } from "@/types/client";
 import { cn } from "@/lib/utils";
 import { useClients, NewClientData } from "@/hooks/useClients";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "./ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "./ui/alert-dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "./ui/select";
@@ -34,7 +38,8 @@ const emptyForm: NewClientData = {
 };
 
 export function ClientsTable() {
-  const { clients, loading, createClient, updateClient } = useClients();
+  const { clients, loading, createClient, updateClient, deleteClient } = useClients();
+  const [deletingClientId, setDeletingClientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
@@ -346,8 +351,8 @@ export function ClientsTable() {
                         <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)} title="Редактировать">
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
-                          <Phone className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} title="Удалить" className="text-destructive hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>
@@ -358,6 +363,32 @@ export function ClientsTable() {
           </div>
         )}
       </div>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deletingClientId} onOpenChange={(open) => !open && setDeletingClientId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить клиента?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Это действие нельзя отменить. Все данные клиента будут удалены.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (deletingClientId) {
+                  await deleteClient(deletingClientId);
+                  setDeletingClientId(null);
+                }
+              }}
+            >
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
