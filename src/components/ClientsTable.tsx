@@ -351,8 +351,8 @@ export function ClientsTable() {
                         <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)} title="Редактировать">
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
-                          <Phone className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} title="Удалить" className="text-destructive hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>
