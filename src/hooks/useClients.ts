@@ -97,6 +97,32 @@ export function useClients() {
     [user, loadClients]
   );
 
+  const updateClient = useCallback(
+    async (clientId: string, data: Partial<NewClientData>): Promise<boolean> => {
+      try {
+        const mapped: Record<string, unknown> = {};
+        if (data.firstName !== undefined) mapped.first_name = data.firstName.trim();
+        if (data.lastName !== undefined) mapped.last_name = data.lastName.trim();
+        if (data.email !== undefined) mapped.email = data.email.trim();
+        if (data.phone !== undefined) mapped.phone = data.phone.trim();
+        if (data.socialMedia !== undefined) mapped.social_media = data.socialMedia.trim();
+        if (data.messengers !== undefined) mapped.messengers = data.messengers.trim();
+        if (data.status !== undefined) mapped.status = data.status;
+        if (data.comment !== undefined) mapped.comment = data.comment.trim();
+        const { error } = await supabase.from("clients").update(mapped).eq("id", clientId);
+        if (error) throw error;
+        toast.success("Клиент обновлён");
+        await loadClients();
+        return true;
+      } catch (err) {
+        console.error("Error updating client:", err);
+        toast.error("Ошибка обновления клиента");
+        return false;
+      }
+    },
+    [loadClients]
+  );
+
   const deleteClient = useCallback(
     async (clientId: string): Promise<boolean> => {
       try {
