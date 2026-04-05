@@ -13,27 +13,29 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
 
-const menuItems = [
-  { id: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
-  { id: 'clients', label: 'Клиенты', icon: Users },
-  { id: 'campaigns', label: 'Кампании', icon: Phone },
-  { id: 'scripts', label: 'Скрипты', icon: FileText },
-  { id: 'script-editor', label: 'Редактор скриптов', icon: GitBranch },
-  { id: 'objections', label: 'Возражения', icon: MessageSquareWarning },
-  { id: 'script-chat', label: 'Тест скрипта', icon: MessageCircle },
-  { id: 'ai-agent', label: 'AI Агент', icon: Bot },
-  { id: 'sheets', label: 'Google Sheets', icon: Table2 },
-  { id: 'settings', label: 'Настройки', icon: Settings },
+const menuItemKeys = [
+  { id: 'dashboard', labelKey: 'dashboard', icon: LayoutDashboard },
+  { id: 'clients', labelKey: 'clients', icon: Users },
+  { id: 'campaigns', labelKey: 'campaigns', icon: Phone },
+  { id: 'scripts', labelKey: 'scripts', icon: FileText },
+  { id: 'script-editor', labelKey: 'scriptEditor', icon: GitBranch },
+  { id: 'objections', labelKey: 'objections', icon: MessageSquareWarning },
+  { id: 'script-chat', labelKey: 'scriptChat', icon: MessageCircle },
+  { id: 'ai-agent', labelKey: 'aiAgent', icon: Bot },
+  { id: 'sheets', labelKey: 'sheets', icon: Table2 },
+  { id: 'settings', labelKey: 'settings', icon: Settings },
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const { signOut } = useAuth();
+  const { t } = useLanguage();
   
   return (
     <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
@@ -44,14 +46,14 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           </div>
           <div>
             <h1 className="font-semibold text-foreground">CallAI Pro</h1>
-            <p className="text-xs text-muted-foreground">Холодный прозвон</p>
+            <p className="text-xs text-muted-foreground">{t("sidebar", "coldCalling")}</p>
           </div>
         </div>
       </div>
       
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
-          {menuItems.map((item) => {
+          {menuItemKeys.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             
@@ -67,7 +69,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
                   )}
                 >
                   <Icon className="w-5 h-5" />
-                  {item.label}
+                  {t("sidebar", item.labelKey)}
                 </button>
               </li>
             );
@@ -79,17 +81,17 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         <div className="glass rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-xs text-muted-foreground">AI Агент</span>
+            <span className="text-xs text-muted-foreground">{t("sidebar", "aiAgent")}</span>
           </div>
-          <p className="text-sm font-medium text-foreground">Активен</p>
-          <p className="text-xs text-muted-foreground mt-1">Готов к звонкам</p>
+          <p className="text-sm font-medium text-foreground">{t("sidebar", "active")}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t("sidebar", "readyForCalls")}</p>
         </div>
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Выйти
+          {t("sidebar", "signOut")}
         </button>
       </div>
     </aside>
