@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import {
-  MessageSquare, Send, RotateCcw, Play, User, Bot, Loader2, FileText, Users, Headphones, FastForward,
+  Send, RotateCcw, Play, User, Bot, Loader2, FileText, Users, Headphones, FastForward,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
