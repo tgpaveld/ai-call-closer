@@ -57,12 +57,39 @@ export function ClientsTable() {
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
     setSaving(true);
-    const ok = await createClient(form);
+    let ok: boolean;
+    if (editingClient) {
+      ok = await updateClient(editingClient.id, form);
+    } else {
+      ok = await createClient(form);
+    }
     setSaving(false);
     if (ok) {
       setForm(emptyForm);
+      setEditingClient(null);
       setShowDialog(false);
     }
+  };
+
+  const openEditDialog = (client: Client) => {
+    setEditingClient(client);
+    setForm({
+      firstName: client.firstName,
+      lastName: client.lastName,
+      email: client.email,
+      phone: client.phone,
+      socialMedia: client.socialMedia,
+      messengers: client.messengers,
+      status: client.status,
+      comment: client.comment,
+    });
+    setShowDialog(true);
+  };
+
+  const openCreateDialog = () => {
+    setEditingClient(null);
+    setForm(emptyForm);
+    setShowDialog(true);
   };
 
   const updateField = <K extends keyof NewClientData>(key: K, value: NewClientData[K]) => {
