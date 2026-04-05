@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, MoreHorizontal, Loader2 } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, MoreHorizontal, Loader2, Pencil } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -34,10 +34,11 @@ const emptyForm: NewClientData = {
 };
 
 export function ClientsTable() {
-  const { clients, loading, createClient } = useClients();
+  const { clients, loading, createClient, updateClient } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [form, setForm] = useState<NewClientData>(emptyForm);
   const [saving, setSaving] = useState(false);
 
@@ -56,12 +57,39 @@ export function ClientsTable() {
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
     setSaving(true);
-    const ok = await createClient(form);
+    let ok: boolean;
+    if (editingClient) {
+      ok = await updateClient(editingClient.id, form);
+    } else {
+      ok = await createClient(form);
+    }
     setSaving(false);
     if (ok) {
       setForm(emptyForm);
+      setEditingClient(null);
       setShowDialog(false);
     }
+  };
+
+  const openEditDialog = (client: Client) => {
+    setEditingClient(client);
+    setForm({
+      firstName: client.firstName,
+      lastName: client.lastName,
+      email: client.email,
+      phone: client.phone,
+      socialMedia: client.socialMedia,
+      messengers: client.messengers,
+      status: client.status,
+      comment: client.comment,
+    });
+    setShowDialog(true);
+  };
+
+  const openCreateDialog = () => {
+    setEditingClient(null);
+    setForm(emptyForm);
+    setShowDialog(true);
   };
 
   const updateField = <K extends keyof NewClientData>(key: K, value: NewClientData[K]) => {
@@ -76,17 +104,20 @@ export function ClientsTable() {
           <h1 className="text-3xl font-bold text-foreground">Клиенты</h1>
           <p className="text-muted-foreground mt-1">Управление базой клиентов</p>
         </div>
-        <Button onClick={() => setShowDialog(true)}>
+        <Button onClick={openCreateDialog}>
           <Plus className="w-4 h-4 mr-2" />
           Добавить клиента
         </Button>
       </div>
 
       {/* New client dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <Dialog open={showDialog} onOpenChange={(open) => {
+        setShowDialog(open);
+        if (!open) setEditingClient(null);
+      }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Новый клиент</DialogTitle>
+            <DialogTitle>{editingClient ? "Редактировать клиента" : "Новый клиент"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="grid grid-cols-2 gap-4">
@@ -185,7 +216,7 @@ export function ClientsTable() {
             </Button>
             <Button onClick={handleSubmit} disabled={!form.firstName.trim() || saving}>
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Добавить
+              {editingClient ? "Сохранить" : "Добавить"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -312,11 +343,11 @@ export function ClientsTable() {
                     </td>
                     <td className="py-4 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Phone className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)} title="Редактировать">
+                          <Pencil className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <Phone className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>
