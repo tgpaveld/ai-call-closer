@@ -343,11 +343,11 @@ export function ClientsTable() {
                     </td>
                     <td className="py-4 px-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Phone className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)} title="Редактировать">
+                          <Pencil className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <Phone className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>
