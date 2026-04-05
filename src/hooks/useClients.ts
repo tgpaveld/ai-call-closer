@@ -148,5 +148,5 @@ export function useClients() {
     }
   }, [loadClients, user]);
 
-  return { clients, loading, createClient, deleteClient, reloadClients: loadClients };
+  return { clients, loading, createClient, updateClient, deleteClient, reloadClients: loadClients };
 }
