@@ -34,10 +34,11 @@ const emptyForm: NewClientData = {
 };
 
 export function ClientsTable() {
-  const { clients, loading, createClient } = useClients();
+  const { clients, loading, createClient, updateClient } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [form, setForm] = useState<NewClientData>(emptyForm);
   const [saving, setSaving] = useState(false);
 
