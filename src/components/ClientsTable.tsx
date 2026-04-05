@@ -38,7 +38,8 @@ const emptyForm: NewClientData = {
 };
 
 export function ClientsTable() {
-  const { clients, loading, createClient, updateClient } = useClients();
+  const { clients, loading, createClient, updateClient, deleteClient } = useClients();
+  const [deletingClientId, setDeletingClientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
