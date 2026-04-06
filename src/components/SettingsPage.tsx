@@ -1,13 +1,28 @@
 import { useState } from "react";
-import { User, Phone, Bot, Shield, Globe } from "lucide-react";
+import { User, Phone, Bot, Shield, Globe, Sun, Moon, Monitor, Clock } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme, AppTheme } from "@/contexts/ThemeContext";
 import { AppLanguage, languageLabels } from "@/i18n/translations";
+
+const TIMEZONES = [
+  "Europe/Moscow", "Europe/Kiev", "Europe/London", "Europe/Berlin",
+  "Europe/Paris", "Europe/Madrid", "America/New_York", "America/Chicago",
+  "America/Denver", "America/Los_Angeles", "Asia/Tokyo", "Asia/Shanghai",
+  "Asia/Dubai", "Asia/Kolkata", "Australia/Sydney", "Pacific/Auckland",
+];
+
+const themeIcons: Record<AppTheme, typeof Sun> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+};
 
 export function SettingsPage() {
   const { t, language, setLanguage } = useLanguage();
+  const { theme, setTheme, timezone, setTimezone } = useTheme();
   const [companyName, setCompanyName] = useState('Моя компания');
   const [websiteUrl, setWebsiteUrl] = useState('https://example.com');
   const [agentName, setAgentName] = useState('Анна');
