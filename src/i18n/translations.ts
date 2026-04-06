@@ -329,6 +329,13 @@ const translations = {
     saveChanges: { ru: "Сохранить изменения", en: "Save Changes", uk: "Зберегти зміни", es: "Guardar cambios" },
     language: { ru: "Язык интерфейса", en: "Interface Language", uk: "Мова інтерфейсу", es: "Idioma de la interfaz" },
     languageDesc: { ru: "Выберите язык для отображения интерфейса", en: "Choose the language for the interface", uk: "Оберіть мову для відображення інтерфейсу", es: "Elija el idioma para la interfaz" },
+    theme: { ru: "Тема оформления", en: "Theme", uk: "Тема оформлення", es: "Tema" },
+    themeDesc: { ru: "Выберите тему оформления интерфейса", en: "Choose the interface theme", uk: "Оберіть тему оформлення інтерфейсу", es: "Elija el tema de la interfaz" },
+    themeDark: { ru: "Тёмная", en: "Dark", uk: "Темна", es: "Oscuro" },
+    themeLight: { ru: "Светлая", en: "Light", uk: "Світла", es: "Claro" },
+    themeSystem: { ru: "Системная", en: "System", uk: "Системна", es: "Sistema" },
+    timezone: { ru: "Часовой пояс", en: "Timezone", uk: "Часовий пояс", es: "Zona horaria" },
+    timezoneDesc: { ru: "Часовой пояс для отображения дат и времени", en: "Timezone for displaying dates and times", uk: "Часовий пояс для відображення дат і часу", es: "Zona horaria para mostrar fechas y horas" },
   },
 
   // Login
