@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from "react";
 import translations, { AppLanguage } from "@/i18n/translations";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LanguageContextType {
   language: AppLanguage;
@@ -14,10 +15,60 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem("app-language");
     return (saved as AppLanguage) || "ru";
   });
+  const initialLoadDone = useRef(false);
 
-  const setLanguage = useCallback((lang: AppLanguage) => {
+  // Load language from DB on auth
+  useEffect(() => {
+    const loadFromDb = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from("user_preferences")
+        .select("language")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+      if (data?.language) {
+        const lang = data.language as AppLanguage;
+        setLanguageState(lang);
+        localStorage.setItem("app-language", lang);
+      }
+      initialLoadDone.current = true;
+    };
+    loadFromDb();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        supabase
+          .from("user_preferences")
+          .select("language")
+          .eq("user_id", session.user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.language) {
+              const lang = data.language as AppLanguage;
+              setLanguageState(lang);
+              localStorage.setItem("app-language", lang);
+            }
+            initialLoadDone.current = true;
+          });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const setLanguage = useCallback(async (lang: AppLanguage) => {
     setLanguageState(lang);
     localStorage.setItem("app-language", lang);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      await supabase
+        .from("user_preferences")
+        .upsert(
+          { user_id: session.user.id, language: lang },
+          { onConflict: "user_id" }
+        );
+    }
   }, []);
 
   const t = useCallback(
