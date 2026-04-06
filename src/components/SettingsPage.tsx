@@ -1,13 +1,28 @@
 import { useState } from "react";
-import { User, Phone, Bot, Shield, Globe } from "lucide-react";
+import { User, Phone, Bot, Shield, Globe, Sun, Moon, Monitor, Clock } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme, AppTheme } from "@/contexts/ThemeContext";
 import { AppLanguage, languageLabels } from "@/i18n/translations";
+
+const TIMEZONES = [
+  "Europe/Moscow", "Europe/Kiev", "Europe/London", "Europe/Berlin",
+  "Europe/Paris", "Europe/Madrid", "America/New_York", "America/Chicago",
+  "America/Denver", "America/Los_Angeles", "Asia/Tokyo", "Asia/Shanghai",
+  "Asia/Dubai", "Asia/Kolkata", "Australia/Sydney", "Pacific/Auckland",
+];
+
+const themeIcons: Record<AppTheme, typeof Sun> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+};
 
 export function SettingsPage() {
   const { t, language, setLanguage } = useLanguage();
+  const { theme, setTheme, timezone, setTimezone } = useTheme();
   const [companyName, setCompanyName] = useState('Моя компания');
   const [websiteUrl, setWebsiteUrl] = useState('https://example.com');
   const [agentName, setAgentName] = useState('Анна');
@@ -48,6 +63,60 @@ export function SettingsPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Theme */}
+        <div className="glass rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Sun className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">{t("settings", "theme")}</h2>
+              <p className="text-xs text-muted-foreground">{t("settings", "themeDesc")}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {(["light", "dark", "system"] as AppTheme[]).map((th) => {
+              const Icon = themeIcons[th];
+              return (
+                <button
+                  key={th}
+                  onClick={() => setTheme(th)}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                    theme === th
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-secondary/50 text-muted-foreground hover:border-border hover:bg-secondary"
+                  }`}
+                >
+                  <Icon className="w-6 h-6" />
+                  <span className="font-medium text-sm">{t("settings", `theme${th.charAt(0).toUpperCase() + th.slice(1)}`)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Timezone */}
+        <div className="glass rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">{t("settings", "timezone")}</h2>
+              <p className="text-xs text-muted-foreground">{t("settings", "timezoneDesc")}</p>
+            </div>
+          </div>
+          <select
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className="w-full p-3 rounded-lg border-2 border-border bg-secondary/50 text-foreground focus:border-primary focus:outline-none transition-all"
+          >
+            {TIMEZONES.map((tz) => (
+              <option key={tz} value={tz}>{tz.replace(/_/g, " ")}</option>
+            ))}
+          </select>
         </div>
 
         {/* Company */}

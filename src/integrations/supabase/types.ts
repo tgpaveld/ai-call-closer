@@ -169,6 +169,8 @@ export type Database = {
           created_at: string
           id: string
           language: string
+          theme: string
+          timezone: string
           updated_at: string
           user_id: string
         }
@@ -176,6 +178,8 @@ export type Database = {
           created_at?: string
           id?: string
           language?: string
+          theme?: string
+          timezone?: string
           updated_at?: string
           user_id: string
         }
@@ -183,6 +187,8 @@ export type Database = {
           created_at?: string
           id?: string
           language?: string
+          theme?: string
+          timezone?: string
           updated_at?: string
           user_id?: string
         }
