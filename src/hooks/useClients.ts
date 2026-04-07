@@ -140,6 +140,33 @@ export function useClients() {
     []
   );
 
+  const bulkCreateClients = useCallback(
+    async (rows: NewClientData[]): Promise<number> => {
+      if (!user || rows.length === 0) return 0;
+      try {
+        const mapped = rows.map((d) => ({
+          user_id: user.id,
+          first_name: d.firstName.trim(),
+          last_name: d.lastName.trim(),
+          email: d.email.trim(),
+          phone: d.phone.trim(),
+          social_media: d.socialMedia.trim(),
+          messengers: d.messengers.trim(),
+          status: d.status,
+          comment: d.comment.trim(),
+        }));
+        const { error } = await supabase.from("clients").insert(mapped);
+        if (error) throw error;
+        await loadClients();
+        return rows.length;
+      } catch (err) {
+        console.error("Error bulk creating clients:", err);
+        throw err;
+      }
+    },
+    [user, loadClients]
+  );
+
   useEffect(() => {
     if (user) {
       loadClients();
@@ -148,5 +175,5 @@ export function useClients() {
     }
   }, [loadClients, user]);
 
-  return { clients, loading, createClient, updateClient, deleteClient, reloadClients: loadClients };
+  return { clients, loading, createClient, updateClient, deleteClient, bulkCreateClients, reloadClients: loadClients };
 }

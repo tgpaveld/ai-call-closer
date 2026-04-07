@@ -83,6 +83,11 @@ const translations = {
     statusCallback: { ru: "Перезвонить", en: "Callback", uk: "Передзвонити", es: "Devolver llamada" },
     statusInterested: { ru: "Заинтересован", en: "Interested", uk: "Зацікавлений", es: "Interesado" },
     statusNotInterested: { ru: "Не интересует", en: "Not Interested", uk: "Не цікавить", es: "No interesado" },
+    importCsv: { ru: "Импорт CSV", en: "Import CSV", uk: "Імпорт CSV", es: "Importar CSV" },
+    importSuccess: { ru: "Импортировано клиентов: {count}", en: "Imported clients: {count}", uk: "Імпортовано клієнтів: {count}", es: "Clientes importados: {count}" },
+    importError: { ru: "Ошибка импорта CSV", en: "CSV import error", uk: "Помилка імпорту CSV", es: "Error de importación CSV" },
+    importNoData: { ru: "Файл не содержит данных для импорта", en: "File contains no data to import", uk: "Файл не містить даних для імпорту", es: "El archivo no contiene datos para importar" },
+    importNoName: { ru: "В CSV отсутствует обязательный столбец 'first_name' или 'firstName'", en: "CSV is missing required column 'first_name' or 'firstName'", uk: "У CSV відсутній обов'язковий стовпець 'first_name' або 'firstName'", es: "Falta la columna requerida 'first_name' o 'firstName' en el CSV" },
   },
 
   // Campaigns
