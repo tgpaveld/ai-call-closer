@@ -89,6 +89,11 @@ const translations = {
     importNoData: { ru: "Файл не содержит данных для импорта", en: "File contains no data to import", uk: "Файл не містить даних для імпорту", es: "El archivo no contiene datos para importar" },
     importNoName: { ru: "В CSV отсутствует обязательный столбец 'first_name' или 'firstName'", en: "CSV is missing required column 'first_name' or 'firstName'", uk: "У CSV відсутній обов'язковий стовпець 'first_name' або 'firstName'", es: "Falta la columna requerida 'first_name' o 'firstName' en el CSV" },
     exportCsv: { ru: "Экспорт CSV", en: "Export CSV", uk: "Експорт CSV", es: "Exportar CSV" },
+    dragDropTitle: { ru: "Перетащите CSV файл сюда", en: "Drag & drop CSV file here", uk: "Перетягніть CSV файл сюди", es: "Arrastra el archivo CSV aquí" },
+    dragDropOr: { ru: "или", en: "or", uk: "або", es: "o" },
+    dragDropButton: { ru: "Выберите файл", en: "Choose file", uk: "Оберіть файл", es: "Elegir archivo" },
+    dragDropActive: { ru: "Отпустите файл для загрузки", en: "Drop the file to upload", uk: "Відпустіть файл для завантаження", es: "Suelta el archivo para cargar" },
+    dragDropInvalidType: { ru: "Поддерживаются только CSV файлы", en: "Only CSV files are supported", uk: "Підтримуються лише CSV файли", es: "Solo se admiten archivos CSV" },
   },
 
   // Campaigns
