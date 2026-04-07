@@ -110,6 +110,24 @@ export function ClientsTable() {
     }
   };
 
+  const handleCsvExport = () => {
+    const headers = ["first_name", "last_name", "email", "phone", "social_media", "messengers", "status", "comment"];
+    const rows = filteredClients.map((c) =>
+      [c.firstName, c.lastName, c.email, c.phone, c.socialMedia, c.messengers, c.status, c.comment]
+        .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
+        .join(",")
+    );
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clients_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(t("clients", "exportCsv"));
+  };
+
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
       const matchesSearch =
