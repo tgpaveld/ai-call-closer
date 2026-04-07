@@ -125,33 +125,7 @@ export function ClientsTable() {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
-    setImporting(true);
-    try {
-      const text = await file.text();
-      const rows = parseCsv(text);
-      if (rows.length === 0) { toast.error(t("clients", "importNoData")); return; }
-      const headers = Object.keys(rows[0]).map((h) => h.toLowerCase());
-      const hasName = headers.some((h) => columnMap[h] === "firstName");
-      if (!hasName) { toast.error(t("clients", "importNoName")); return; }
-      const mapped: NewClientData[] = rows
-        .map((row) => {
-          const client: NewClientData = { ...emptyForm };
-          Object.entries(row).forEach(([key, value]) => {
-            const field = columnMap[key.toLowerCase()];
-            if (field) (client as any)[field] = value;
-          });
-          return client;
-        })
-        .filter((c) => c.firstName.trim());
-      if (mapped.length === 0) { toast.error(t("clients", "importNoData")); return; }
-      const count = await bulkCreateClients(mapped);
-      toast.success(t("clients", "importSuccess").replace("{count}", String(count)));
-    } catch (err) {
-      console.error("CSV import error:", err);
-      toast.error(t("clients", "importError"));
-    } finally {
-      setImporting(false);
-    }
+    processFile(file);
   };
 
   const handleCsvExport = () => {
