@@ -88,6 +88,7 @@ const translations = {
     importError: { ru: "Ошибка импорта CSV", en: "CSV import error", uk: "Помилка імпорту CSV", es: "Error de importación CSV" },
     importNoData: { ru: "Файл не содержит данных для импорта", en: "File contains no data to import", uk: "Файл не містить даних для імпорту", es: "El archivo no contiene datos para importar" },
     importNoName: { ru: "В CSV отсутствует обязательный столбец 'first_name' или 'firstName'", en: "CSV is missing required column 'first_name' or 'firstName'", uk: "У CSV відсутній обов'язковий стовпець 'first_name' або 'firstName'", es: "Falta la columna requerida 'first_name' o 'firstName' en el CSV" },
+    exportCsv: { ru: "Экспорт CSV", en: "Export CSV", uk: "Експорт CSV", es: "Exportar CSV" },
   },
 
   // Campaigns
