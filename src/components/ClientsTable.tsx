@@ -158,10 +158,17 @@ export function ClientsTable() {
           <h1 className="text-3xl font-bold text-foreground">{t("clients", "title")}</h1>
           <p className="text-muted-foreground mt-1">{t("clients", "subtitle")}</p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t("clients", "addClient")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <input type="file" ref={fileInputRef} accept=".csv" className="hidden" onChange={handleCsvImport} />
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+            {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+            {t("clients", "importCsv")}
+          </Button>
+          <Button onClick={openCreateDialog}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("clients", "addClient")}
+          </Button>
+        </div>
       </div>
 
       <Dialog open={showDialog} onOpenChange={(open) => { setShowDialog(open); if (!open) setEditingClient(null); }}>
