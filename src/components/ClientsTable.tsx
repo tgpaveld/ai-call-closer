@@ -273,6 +273,40 @@ export function ClientsTable() {
         </DialogContent>
       </Dialog>
 
+      {/* Drag & Drop Zone */}
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={cn(
+          "border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer",
+          isDragging
+            ? "border-primary bg-primary/10 scale-[1.01]"
+            : "border-border hover:border-primary/50 hover:bg-secondary/30"
+        )}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        {importing ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : isDragging ? (
+          <div className="flex flex-col items-center gap-2">
+            <FileUp className="w-8 h-8 text-primary animate-bounce" />
+            <p className="text-sm font-medium text-primary">{t("clients", "dragDropActive")}</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <Upload className="w-8 h-8 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">{t("clients", "dragDropTitle")}</p>
+            <p className="text-xs text-muted-foreground">{t("clients", "dragDropOr")}</p>
+            <Button variant="outline" size="sm" type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>
+              {t("clients", "dragDropButton")}
+            </Button>
+          </div>
+        )}
+      </div>
+
       <div className="glass rounded-xl p-6">
         <div className="flex items-center gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
