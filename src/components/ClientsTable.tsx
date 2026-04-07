@@ -182,6 +182,10 @@ export function ClientsTable() {
             {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
             {t("clients", "importCsv")}
           </Button>
+          <Button variant="outline" onClick={handleCsvExport} disabled={clients.length === 0}>
+            <Download className="w-4 h-4 mr-2" />
+            {t("clients", "exportCsv")}
+          </Button>
           <Button onClick={openCreateDialog}>
             <Plus className="w-4 h-4 mr-2" />
             {t("clients", "addClient")}
