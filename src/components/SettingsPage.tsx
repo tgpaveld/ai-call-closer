@@ -83,7 +83,7 @@ export function SettingsPage() {
               return (
                 <button
                   key={th}
-                  onClick={() => setTheme(th)}
+                  onClick={() => { setTheme(th); toast.success(t("settings", "themeSaved")); }}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                     theme === th
                       ? "border-primary bg-primary/10 text-foreground"
