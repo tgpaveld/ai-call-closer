@@ -42,8 +42,9 @@ const emptyForm: NewClientData = {
 };
 
 export function ClientsTable() {
-  const { clients, loading, createClient, updateClient, deleteClient } = useClients();
+  const { clients, loading, createClient, updateClient, deleteClient, bulkCreateClients } = useClients();
   const { t } = useLanguage();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -51,6 +52,63 @@ export function ClientsTable() {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [form, setForm] = useState<NewClientData>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+
+  const parseCsv = (text: string): Record<string, string>[] => {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim());
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(/[,;]/).map((h) => h.trim().replace(/^"|"$/g, ""));
+    return lines.slice(1).map((line) => {
+      const values = line.split(/[,;]/).map((v) => v.trim().replace(/^"|"$/g, ""));
+      const row: Record<string, string> = {};
+      headers.forEach((h, i) => { row[h] = values[i] || ""; });
+      return row;
+    });
+  };
+
+  const columnMap: Record<string, keyof NewClientData> = {
+    first_name: "firstName", firstname: "firstName", "имя": "firstName", name: "firstName",
+    last_name: "lastName", lastname: "lastName", "фамилия": "lastName",
+    email: "email", "почта": "email",
+    phone: "phone", "телефон": "phone",
+    social_media: "socialMedia", socialmedia: "socialMedia", "соцсети": "socialMedia",
+    messengers: "messengers", messenger: "messengers", "мессенджеры": "messengers",
+    status: "status", "статус": "status",
+    comment: "comment", "комментарий": "comment",
+  };
+
+  const handleCsvImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const rows = parseCsv(text);
+      if (rows.length === 0) { toast.error(t("clients", "importNoData")); return; }
+      const headers = Object.keys(rows[0]).map((h) => h.toLowerCase());
+      const hasName = headers.some((h) => columnMap[h] === "firstName");
+      if (!hasName) { toast.error(t("clients", "importNoName")); return; }
+      const mapped: NewClientData[] = rows
+        .map((row) => {
+          const client: NewClientData = { ...emptyForm };
+          Object.entries(row).forEach(([key, value]) => {
+            const field = columnMap[key.toLowerCase()];
+            if (field) (client as any)[field] = value;
+          });
+          return client;
+        })
+        .filter((c) => c.firstName.trim());
+      if (mapped.length === 0) { toast.error(t("clients", "importNoData")); return; }
+      const count = await bulkCreateClients(mapped);
+      toast.success(t("clients", "importSuccess").replace("{count}", String(count)));
+    } catch (err) {
+      console.error("CSV import error:", err);
+      toast.error(t("clients", "importError"));
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
