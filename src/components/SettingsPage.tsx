@@ -52,7 +52,7 @@ export function SettingsPage() {
             {(Object.keys(languageLabels) as AppLanguage[]).map((lang) => (
               <button
                 key={lang}
-                onClick={() => setLanguage(lang)}
+                onClick={() => { setLanguage(lang); toast.success(t("settings", "languageSaved")); }}
                 className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                   language === lang
                     ? "border-primary bg-primary/10 text-foreground"
