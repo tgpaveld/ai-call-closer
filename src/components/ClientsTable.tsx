@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useMemo, useState, useRef } from "react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -7,6 +7,7 @@ import { Client } from "@/types/client";
 import { cn } from "@/lib/utils";
 import { useClients, NewClientData } from "@/hooks/useClients";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "./ui/dialog";
