@@ -111,7 +111,7 @@ export function SettingsPage() {
           </div>
           <select
             value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
+            onChange={(e) => { setTimezone(e.target.value); toast.success(t("settings", "timezoneSaved")); }}
             className="w-full p-3 rounded-lg border-2 border-border bg-secondary/50 text-foreground focus:border-primary focus:outline-none transition-all"
           >
             {TIMEZONES.map((tz) => (
