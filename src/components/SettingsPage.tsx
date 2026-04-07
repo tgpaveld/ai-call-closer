@@ -6,6 +6,7 @@ import { Switch } from "./ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme, AppTheme } from "@/contexts/ThemeContext";
 import { AppLanguage, languageLabels } from "@/i18n/translations";
+import { toast } from "sonner";
 
 const TIMEZONES = [
   "Europe/Moscow", "Europe/Kiev", "Europe/London", "Europe/Berlin",
