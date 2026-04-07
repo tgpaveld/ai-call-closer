@@ -6,6 +6,7 @@ import { Switch } from "./ui/switch";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme, AppTheme } from "@/contexts/ThemeContext";
 import { AppLanguage, languageLabels } from "@/i18n/translations";
+import { toast } from "sonner";
 
 const TIMEZONES = [
   "Europe/Moscow", "Europe/Kiev", "Europe/London", "Europe/Berlin",
@@ -51,7 +52,7 @@ export function SettingsPage() {
             {(Object.keys(languageLabels) as AppLanguage[]).map((lang) => (
               <button
                 key={lang}
-                onClick={() => setLanguage(lang)}
+                onClick={() => { setLanguage(lang); toast.success(t("settings", "languageSaved")); }}
                 className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                   language === lang
                     ? "border-primary bg-primary/10 text-foreground"
@@ -82,7 +83,7 @@ export function SettingsPage() {
               return (
                 <button
                   key={th}
-                  onClick={() => setTheme(th)}
+                  onClick={() => { setTheme(th); toast.success(t("settings", "themeSaved")); }}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                     theme === th
                       ? "border-primary bg-primary/10 text-foreground"
@@ -110,7 +111,7 @@ export function SettingsPage() {
           </div>
           <select
             value={timezone}
-            onChange={(e) => setTimezone(e.target.value)}
+            onChange={(e) => { setTimezone(e.target.value); toast.success(t("settings", "timezoneSaved")); }}
             className="w-full p-3 rounded-lg border-2 border-border bg-secondary/50 text-foreground focus:border-primary focus:outline-none transition-all"
           >
             {TIMEZONES.map((tz) => (

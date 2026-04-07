@@ -336,6 +336,9 @@ const translations = {
     themeSystem: { ru: "Системная", en: "System", uk: "Системна", es: "Sistema" },
     timezone: { ru: "Часовой пояс", en: "Timezone", uk: "Часовий пояс", es: "Zona horaria" },
     timezoneDesc: { ru: "Часовой пояс для отображения дат и времени", en: "Timezone for displaying dates and times", uk: "Часовий пояс для відображення дат і часу", es: "Zona horaria para mostrar fechas y horas" },
+    themeSaved: { ru: "Тема сохранена", en: "Theme saved", uk: "Тему збережено", es: "Tema guardado" },
+    timezoneSaved: { ru: "Часовой пояс сохранён", en: "Timezone saved", uk: "Часовий пояс збережено", es: "Zona horaria guardada" },
+    languageSaved: { ru: "Язык сохранён", en: "Language saved", uk: "Мову збережено", es: "Idioma guardado" },
   },
 
   // Login
