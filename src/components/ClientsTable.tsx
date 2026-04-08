@@ -160,6 +160,16 @@ export function ClientsTable() {
     });
   }, [clients, searchQuery, filterStatus]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedClients = useMemo(() => {
+    const start = (safePage - 1) * rowsPerPage;
+    return filteredClients.slice(start, start + rowsPerPage);
+  }, [filteredClients, safePage, rowsPerPage]);
+
+  // Reset page when filters change
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus]);
+
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
     setSaving(true);
