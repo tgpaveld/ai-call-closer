@@ -54,6 +54,8 @@ export function ClientsTable() {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith(".csv")) {
