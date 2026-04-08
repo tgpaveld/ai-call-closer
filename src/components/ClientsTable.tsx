@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
