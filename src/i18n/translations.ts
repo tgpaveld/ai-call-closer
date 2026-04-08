@@ -94,6 +94,10 @@ const translations = {
     dragDropButton: { ru: "Выберите файл", en: "Choose file", uk: "Оберіть файл", es: "Elegir archivo" },
     dragDropActive: { ru: "Отпустите файл для загрузки", en: "Drop the file to upload", uk: "Відпустіть файл для завантаження", es: "Suelta el archivo para cargar" },
     dragDropInvalidType: { ru: "Поддерживаются только CSV файлы", en: "Only CSV files are supported", uk: "Підтримуються лише CSV файли", es: "Solo se admiten archivos CSV" },
+    page: { ru: "Стр.", en: "Page", uk: "Стор.", es: "Pág." },
+    of: { ru: "из", en: "of", uk: "з", es: "de" },
+    rowsPerPage: { ru: "Строк на странице:", en: "Rows per page:", uk: "Рядків на сторінці:", es: "Filas por página:" },
+    showing: { ru: "Показано", en: "Showing", uk: "Показано", es: "Mostrando" },
   },
 
   // Campaigns

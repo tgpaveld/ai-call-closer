@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -54,6 +54,8 @@ export function ClientsTable() {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith(".csv")) {
@@ -157,6 +159,16 @@ export function ClientsTable() {
       return matchesSearch && matchesStatus;
     });
   }, [clients, searchQuery, filterStatus]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedClients = useMemo(() => {
+    const start = (safePage - 1) * rowsPerPage;
+    return filteredClients.slice(start, start + rowsPerPage);
+  }, [filteredClients, safePage, rowsPerPage]);
+
+  // Reset page when filters change
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus]);
 
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
@@ -336,60 +348,100 @@ export function ClientsTable() {
             {clients.length === 0 ? t("clients", "noClients") : t("clients", "notFound")}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
-                  <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredClients.map((client) => (
-                  <tr key={client.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary">{client.firstName?.[0] ?? ""}{client.lastName?.[0] ?? ""}</span>
-                        </div>
-                        <p className="font-medium text-foreground">{client.firstName} {client.lastName}</p>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="space-y-1">
-                        {client.email && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail className="w-3 h-3" />{client.email}</div>}
-                        {client.phone && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="w-3 h-3" />{client.phone}</div>}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia || "—"}</span></td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
-                        <MessageCircle className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">{client.messengers || "—"}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className={cn("px-3 py-1 rounded-full text-xs font-medium", statusClassNames[client.status])}>
-                        {t("clients", statusTranslationKeys[client.status] || client.status)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
-                    <td className="py-4 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)}><Pencil className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
+                    <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {paginatedClients.map((client) => (
+                    <tr key={client.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary">{client.firstName?.[0] ?? ""}{client.lastName?.[0] ?? ""}</span>
+                          </div>
+                          <p className="font-medium text-foreground">{client.firstName} {client.lastName}</p>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="space-y-1">
+                          {client.email && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail className="w-3 h-3" />{client.email}</div>}
+                          {client.phone && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="w-3 h-3" />{client.phone}</div>}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia || "—"}</span></td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{client.messengers || "—"}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={cn("px-3 py-1 rounded-full text-xs font-medium", statusClassNames[client.status])}>
+                          {t("clients", statusTranslationKeys[client.status] || client.status)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)}><Pencil className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{t("clients", "rowsPerPage")}</span>
+                <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
+                  <SelectTrigger className="w-[70px] h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[10, 25, 50, 100].map((n) => (
+                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="ml-2">{t("clients", "showing")} {((safePage - 1) * rowsPerPage) + 1}–{Math.min(safePage * rowsPerPage, filteredClients.length)} {t("clients", "of")} {filteredClients.length}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage <= 1} onClick={() => setCurrentPage(safePage - 1)}>
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                  .reduce<(number | string)[]>((acc, p, i, arr) => {
+                    if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    typeof p === "string" ? (
+                      <span key={`e${i}`} className="px-1 text-muted-foreground text-sm">…</span>
+                    ) : (
+                      <Button key={p} variant={p === safePage ? "default" : "outline"} size="icon" className="h-8 w-8 text-xs"
+                        onClick={() => setCurrentPage(p)}>{p}</Button>
+                    )
+                  )}
+                <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage >= totalPages} onClick={() => setCurrentPage(safePage + 1)}>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </>
         )}
       </div>
 
