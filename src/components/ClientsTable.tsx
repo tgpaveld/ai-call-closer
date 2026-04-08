@@ -348,62 +348,62 @@ export function ClientsTable() {
             {clients.length === 0 ? t("clients", "noClients") : t("clients", "notFound")}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
-                  <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
-                  <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedClients.map((client) => (
-                  <tr key={client.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary">{client.firstName?.[0] ?? ""}{client.lastName?.[0] ?? ""}</span>
-                        </div>
-                        <p className="font-medium text-foreground">{client.firstName} {client.lastName}</p>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="space-y-1">
-                        {client.email && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail className="w-3 h-3" />{client.email}</div>}
-                        {client.phone && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="w-3 h-3" />{client.phone}</div>}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia || "—"}</span></td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
-                        <MessageCircle className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">{client.messengers || "—"}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className={cn("px-3 py-1 rounded-full text-xs font-medium", statusClassNames[client.status])}>
-                        {t("clients", statusTranslationKeys[client.status] || client.status)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
-                    <td className="py-4 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)}><Pencil className="w-4 h-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
-                      </div>
-                    </td>
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
+                    <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Pagination */}
-          {filteredClients.length > 0 && (
+                </thead>
+                <tbody>
+                  {paginatedClients.map((client) => (
+                    <tr key={client.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary">{client.firstName?.[0] ?? ""}{client.lastName?.[0] ?? ""}</span>
+                          </div>
+                          <p className="font-medium text-foreground">{client.firstName} {client.lastName}</p>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="space-y-1">
+                          {client.email && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Mail className="w-3 h-3" />{client.email}</div>}
+                          {client.phone && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="w-3 h-3" />{client.phone}</div>}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia || "—"}</span></td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{client.messengers || "—"}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={cn("px-3 py-1 rounded-full text-xs font-medium", statusClassNames[client.status])}>
+                          {t("clients", statusTranslationKeys[client.status] || client.status)}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(client)}><Pencil className="w-4 h-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeletingClientId(client.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>{t("clients", "rowsPerPage")}</span>
@@ -441,7 +441,7 @@ export function ClientsTable() {
                 </Button>
               </div>
             </div>
-          )}
+          </>
         )}
       </div>
 
