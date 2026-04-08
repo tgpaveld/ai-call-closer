@@ -362,7 +362,7 @@ export function ClientsTable() {
                 </tr>
               </thead>
               <tbody>
-                {filteredClients.map((client) => (
+                {paginatedClients.map((client) => (
                   <tr key={client.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
