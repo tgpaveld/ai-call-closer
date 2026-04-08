@@ -402,6 +402,46 @@ export function ClientsTable() {
               </tbody>
             </table>
           </div>
+          {/* Pagination */}
+          {filteredClients.length > 0 && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{t("clients", "rowsPerPage")}</span>
+                <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
+                  <SelectTrigger className="w-[70px] h-8"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[10, 25, 50, 100].map((n) => (
+                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="ml-2">{t("clients", "showing")} {((safePage - 1) * rowsPerPage) + 1}–{Math.min(safePage * rowsPerPage, filteredClients.length)} {t("clients", "of")} {filteredClients.length}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage <= 1} onClick={() => setCurrentPage(safePage - 1)}>
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+                  .reduce<(number | string)[]>((acc, p, i, arr) => {
+                    if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    typeof p === "string" ? (
+                      <span key={`e${i}`} className="px-1 text-muted-foreground text-sm">…</span>
+                    ) : (
+                      <Button key={p} variant={p === safePage ? "default" : "outline"} size="icon" className="h-8 w-8 text-xs"
+                        onClick={() => setCurrentPage(p)}>{p}</Button>
+                    )
+                  )}
+                <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage >= totalPages} onClick={() => setCurrentPage(safePage + 1)}>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         )}
       </div>
 
