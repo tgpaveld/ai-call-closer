@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useCallback } from "react";
-import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Plus, Phone, Mail, MessageCircle, Loader2, Pencil, Trash2, Upload, Download, FileUp, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -56,6 +56,19 @@ export function ClientsTable() {
   const [isDragging, setIsDragging] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sortKey, setSortKey] = useState<"name" | "date" | "status" | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const toggleSort = (key: "name" | "date" | "status") => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const statusOrder: Record<string, number> = { new: 0, called: 1, callback: 2, interested: 3, not_interested: 4 };
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith(".csv")) {
@@ -149,7 +162,7 @@ export function ClientsTable() {
   };
 
   const filteredClients = useMemo(() => {
-    return clients.filter((client) => {
+    const filtered = clients.filter((client) => {
       const matchesSearch =
         `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
         client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -158,7 +171,20 @@ export function ClientsTable() {
       const matchesStatus = filterStatus === "all" || client.status === filterStatus;
       return matchesSearch && matchesStatus;
     });
-  }, [clients, searchQuery, filterStatus]);
+    if (!sortKey) return filtered;
+    const dir = sortDir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "name") {
+        cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      } else if (sortKey === "date") {
+        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortKey === "status") {
+        cmp = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+      }
+      return cmp * dir;
+    });
+  }, [clients, searchQuery, filterStatus, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
   const safePage = Math.min(currentPage, totalPages);
@@ -353,11 +379,27 @@ export function ClientsTable() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "firstName")}
+                        {sortKey === "name" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("status")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "status")}
+                        {sortKey === "status" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "date")}
+                        {sortKey === "date" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
                     <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
                   </tr>
@@ -391,6 +433,7 @@ export function ClientsTable() {
                           {t("clients", statusTranslationKeys[client.status] || client.status)}
                         </span>
                       </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground whitespace-nowrap">{new Date(client.createdAt).toLocaleDateString()}</span></td>
                       <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
