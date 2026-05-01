@@ -162,7 +162,7 @@ export function ClientsTable() {
   };
 
   const filteredClients = useMemo(() => {
-    return clients.filter((client) => {
+    const filtered = clients.filter((client) => {
       const matchesSearch =
         `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
         client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,7 +171,20 @@ export function ClientsTable() {
       const matchesStatus = filterStatus === "all" || client.status === filterStatus;
       return matchesSearch && matchesStatus;
     });
-  }, [clients, searchQuery, filterStatus]);
+    if (!sortKey) return filtered;
+    const dir = sortDir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === "name") {
+        cmp = `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      } else if (sortKey === "date") {
+        cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortKey === "status") {
+        cmp = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+      }
+      return cmp * dir;
+    });
+  }, [clients, searchQuery, filterStatus, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
   const safePage = Math.min(currentPage, totalPages);
