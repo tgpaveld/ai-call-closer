@@ -379,11 +379,27 @@ export function ClientsTable() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "firstName")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("name")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "firstName")}
+                        {sortKey === "name" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "status")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("status")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "status")}
+                        {sortKey === "status" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("date")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "date")}
+                        {sortKey === "date" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "comment")}</th>
                     <th className="text-right py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "actions")}</th>
                   </tr>
