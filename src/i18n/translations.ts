@@ -98,6 +98,7 @@ const translations = {
     of: { ru: "из", en: "of", uk: "з", es: "de" },
     rowsPerPage: { ru: "Строк на странице:", en: "Rows per page:", uk: "Рядків на сторінці:", es: "Filas por página:" },
     showing: { ru: "Показано", en: "Showing", uk: "Показано", es: "Mostrando" },
+    date: { ru: "Дата", en: "Date", uk: "Дата", es: "Fecha" },
   },
 
   // Campaigns
