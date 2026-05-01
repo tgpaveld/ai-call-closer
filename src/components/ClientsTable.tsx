@@ -56,6 +56,19 @@ export function ClientsTable() {
   const [isDragging, setIsDragging] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sortKey, setSortKey] = useState<"name" | "date" | "status" | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  const toggleSort = (key: "name" | "date" | "status") => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const statusOrder: Record<string, number> = { new: 0, called: 1, callback: 2, interested: 3, not_interested: 4 };
 
   const processFile = async (file: File) => {
     if (!file.name.endsWith(".csv")) {
