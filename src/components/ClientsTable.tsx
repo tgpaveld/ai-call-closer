@@ -433,6 +433,7 @@ export function ClientsTable() {
                           {t("clients", statusTranslationKeys[client.status] || client.status)}
                         </span>
                       </td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground whitespace-nowrap">{new Date(client.createdAt).toLocaleDateString()}</span></td>
                       <td className="py-4 px-4"><span className="text-sm text-muted-foreground max-w-[200px] truncate block">{client.comment || "—"}</span></td>
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
