@@ -172,7 +172,11 @@ export function ClientsTable() {
         client.phone.includes(searchQuery) ||
         client.comment?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = filterStatus === "all" || client.status === filterStatus;
-      return matchesSearch && matchesStatus;
+      const matchesSocial = !socialMediaQuery.trim() ||
+        (client.socialMedia || "").toLowerCase().includes(socialMediaQuery.toLowerCase().trim());
+      const matchesMessengers = !messengersQuery.trim() ||
+        (client.messengers || "").toLowerCase().includes(messengersQuery.toLowerCase().trim());
+      return matchesSearch && matchesStatus && matchesSocial && matchesMessengers;
     });
     if (!sortKey) return filtered;
     const dir = sortDir === "asc" ? 1 : -1;
