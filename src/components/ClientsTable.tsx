@@ -209,7 +209,7 @@ export function ClientsTable() {
   }, [filteredClients, safePage, rowsPerPage]);
 
   // Reset page when filters change
-  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus]);
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus, socialMediaQuery, messengersQuery]);
 
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
