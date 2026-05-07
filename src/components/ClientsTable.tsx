@@ -56,10 +56,11 @@ export function ClientsTable() {
   const [isDragging, setIsDragging] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [sortKey, setSortKey] = useState<"name" | "date" | "status" | null>(null);
+  type SortKey = "name" | "date" | "status" | "socialMedia" | "messengers";
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-  const toggleSort = (key: "name" | "date" | "status") => {
+  const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -181,6 +182,14 @@ export function ClientsTable() {
         cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       } else if (sortKey === "status") {
         cmp = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+      } else if (sortKey === "socialMedia" || sortKey === "messengers") {
+        const av = (a[sortKey] || "").trim();
+        const bv = (b[sortKey] || "").trim();
+        // Empty values always go to the bottom regardless of direction
+        if (!av && bv) return 1;
+        if (av && !bv) return -1;
+        if (!av && !bv) return 0;
+        cmp = av.localeCompare(bv, undefined, { sensitivity: "base" });
       }
       return cmp * dir;
     });
@@ -386,8 +395,18 @@ export function ClientsTable() {
                       </button>
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "socialMedia")}</th>
-                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "messengers")}</th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("socialMedia")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "socialMedia")}
+                        {sortKey === "socialMedia" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
+                    <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
+                      <button onClick={() => toggleSort("messengers")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                        {t("clients", "messengers")}
+                        {sortKey === "messengers" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                      </button>
+                    </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
                       <button onClick={() => toggleSort("status")} className="flex items-center gap-1 hover:text-foreground transition-colors">
                         {t("clients", "status")}
