@@ -41,6 +41,20 @@ const emptyForm: NewClientData = {
   socialMedia: "", messengers: "", status: "new", comment: "",
 };
 
+function highlightMatch(text: string, query: string) {
+  if (!text || !query.trim()) return text || "";
+  const q = query.trim();
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return parts.map((part, i) =>
+    part.toLowerCase() === q.toLowerCase() ? (
+      <mark key={i} className="bg-warning/40 text-foreground rounded px-0.5">{part}</mark>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
 export function ClientsTable() {
   const { clients, loading, createClient, updateClient, deleteClient, bulkCreateClients } = useClients();
   const { t } = useLanguage();
@@ -476,11 +490,11 @@ export function ClientsTable() {
                           {client.phone && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="w-3 h-3" />{client.phone}</div>}
                         </div>
                       </td>
-                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia || "—"}</span></td>
+                      <td className="py-4 px-4"><span className="text-sm text-muted-foreground">{client.socialMedia ? highlightMatch(client.socialMedia, socialMediaQuery) : "—"}</span></td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-2">
                           <MessageCircle className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{client.messengers || "—"}</span>
+                          <span className="text-sm text-muted-foreground">{client.messengers ? highlightMatch(client.messengers, messengersQuery) : "—"}</span>
                         </div>
                       </td>
                       <td className="py-4 px-4">
