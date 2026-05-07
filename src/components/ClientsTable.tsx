@@ -47,6 +47,8 @@ export function ClientsTable() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [socialMediaQuery, setSocialMediaQuery] = useState("");
+  const [messengersQuery, setMessengersQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -170,7 +172,11 @@ export function ClientsTable() {
         client.phone.includes(searchQuery) ||
         client.comment?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = filterStatus === "all" || client.status === filterStatus;
-      return matchesSearch && matchesStatus;
+      const matchesSocial = !socialMediaQuery.trim() ||
+        (client.socialMedia || "").toLowerCase().includes(socialMediaQuery.toLowerCase().trim());
+      const matchesMessengers = !messengersQuery.trim() ||
+        (client.messengers || "").toLowerCase().includes(messengersQuery.toLowerCase().trim());
+      return matchesSearch && matchesStatus && matchesSocial && matchesMessengers;
     });
     if (!sortKey) return filtered;
     const dir = sortDir === "asc" ? 1 : -1;
@@ -193,7 +199,7 @@ export function ClientsTable() {
       }
       return cmp * dir;
     });
-  }, [clients, searchQuery, filterStatus, sortKey, sortDir]);
+  }, [clients, searchQuery, filterStatus, socialMediaQuery, messengersQuery, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
   const safePage = Math.min(currentPage, totalPages);
@@ -203,7 +209,7 @@ export function ClientsTable() {
   }, [filteredClients, safePage, rowsPerPage]);
 
   // Reset page when filters change
-  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus]);
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, filterStatus, socialMediaQuery, messengersQuery]);
 
   const handleSubmit = async () => {
     if (!form.firstName.trim()) return;
@@ -396,16 +402,32 @@ export function ClientsTable() {
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      <button onClick={() => toggleSort("socialMedia")} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                        {t("clients", "socialMedia")}
-                        {sortKey === "socialMedia" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
-                      </button>
+                      <div className="space-y-2">
+                        <button onClick={() => toggleSort("socialMedia")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                          {t("clients", "socialMedia")}
+                          {sortKey === "socialMedia" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                        </button>
+                        <Input
+                          placeholder={t("clients", "filterPlaceholder")}
+                          value={socialMediaQuery}
+                          onChange={(e) => setSocialMediaQuery(e.target.value)}
+                          className="h-7 text-xs font-normal bg-secondary/50"
+                        />
+                      </div>
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      <button onClick={() => toggleSort("messengers")} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                        {t("clients", "messengers")}
-                        {sortKey === "messengers" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
-                      </button>
+                      <div className="space-y-2">
+                        <button onClick={() => toggleSort("messengers")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                          {t("clients", "messengers")}
+                          {sortKey === "messengers" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                        </button>
+                        <Input
+                          placeholder={t("clients", "filterPlaceholder")}
+                          value={messengersQuery}
+                          onChange={(e) => setMessengersQuery(e.target.value)}
+                          className="h-7 text-xs font-normal bg-secondary/50"
+                        />
+                      </div>
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
                       <button onClick={() => toggleSort("status")} className="flex items-center gap-1 hover:text-foreground transition-colors">

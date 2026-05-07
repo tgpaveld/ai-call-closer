@@ -97,6 +97,7 @@ const translations = {
     page: { ru: "Стр.", en: "Page", uk: "Стор.", es: "Pág." },
     of: { ru: "из", en: "of", uk: "з", es: "de" },
     rowsPerPage: { ru: "Строк на странице:", en: "Rows per page:", uk: "Рядків на сторінці:", es: "Filas por página:" },
+    filterPlaceholder: { ru: "Фильтр…", en: "Filter…", uk: "Фільтр…", es: "Filtrar…" },
     showing: { ru: "Показано", en: "Showing", uk: "Показано", es: "Mostrando" },
     date: { ru: "Дата", en: "Date", uk: "Дата", es: "Fecha" },
   },
