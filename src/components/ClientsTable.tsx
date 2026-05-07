@@ -56,10 +56,11 @@ export function ClientsTable() {
   const [isDragging, setIsDragging] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [sortKey, setSortKey] = useState<"name" | "date" | "status" | null>(null);
+  type SortKey = "name" | "date" | "status" | "socialMedia" | "messengers";
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-  const toggleSort = (key: "name" | "date" | "status") => {
+  const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
