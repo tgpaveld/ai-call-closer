@@ -380,6 +380,20 @@ export function ClientsTable() {
               </button>
             ))}
           </div>
+          {(searchQuery || socialMediaQuery || messengersQuery || filterStatus !== "all") && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchQuery("");
+                setSocialMediaQuery("");
+                setMessengersQuery("");
+                setFilterStatus("all");
+              }}
+            >
+              {t("clients", "resetFilters")}
+            </Button>
+          )}
         </div>
 
         {loading ? (
