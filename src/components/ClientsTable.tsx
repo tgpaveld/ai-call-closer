@@ -402,16 +402,32 @@ export function ClientsTable() {
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">{t("clients", "contacts")}</th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      <button onClick={() => toggleSort("socialMedia")} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                        {t("clients", "socialMedia")}
-                        {sortKey === "socialMedia" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
-                      </button>
+                      <div className="space-y-2">
+                        <button onClick={() => toggleSort("socialMedia")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                          {t("clients", "socialMedia")}
+                          {sortKey === "socialMedia" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                        </button>
+                        <Input
+                          placeholder={t("clients", "filterPlaceholder")}
+                          value={socialMediaQuery}
+                          onChange={(e) => setSocialMediaQuery(e.target.value)}
+                          className="h-7 text-xs font-normal bg-secondary/50"
+                        />
+                      </div>
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
-                      <button onClick={() => toggleSort("messengers")} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                        {t("clients", "messengers")}
-                        {sortKey === "messengers" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
-                      </button>
+                      <div className="space-y-2">
+                        <button onClick={() => toggleSort("messengers")} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                          {t("clients", "messengers")}
+                          {sortKey === "messengers" ? (sortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />) : <ArrowUpDown className="w-3 h-3 opacity-50" />}
+                        </button>
+                        <Input
+                          placeholder={t("clients", "filterPlaceholder")}
+                          value={messengersQuery}
+                          onChange={(e) => setMessengersQuery(e.target.value)}
+                          className="h-7 text-xs font-normal bg-secondary/50"
+                        />
+                      </div>
                     </th>
                     <th className="text-left py-4 px-4 text-sm font-medium text-muted-foreground">
                       <button onClick={() => toggleSort("status")} className="flex items-center gap-1 hover:text-foreground transition-colors">
