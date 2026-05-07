@@ -47,6 +47,8 @@ export function ClientsTable() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deletingClientId, setDeletingClientId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [socialMediaQuery, setSocialMediaQuery] = useState("");
+  const [messengersQuery, setMessengersQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [showDialog, setShowDialog] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
