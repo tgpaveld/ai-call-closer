@@ -199,7 +199,7 @@ export function ClientsTable() {
       }
       return cmp * dir;
     });
-  }, [clients, searchQuery, filterStatus, sortKey, sortDir]);
+  }, [clients, searchQuery, filterStatus, socialMediaQuery, messengersQuery, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / rowsPerPage));
   const safePage = Math.min(currentPage, totalPages);
