@@ -182,6 +182,14 @@ export function ClientsTable() {
         cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       } else if (sortKey === "status") {
         cmp = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+      } else if (sortKey === "socialMedia" || sortKey === "messengers") {
+        const av = (a[sortKey] || "").trim();
+        const bv = (b[sortKey] || "").trim();
+        // Empty values always go to the bottom regardless of direction
+        if (!av && bv) return 1;
+        if (av && !bv) return -1;
+        if (!av && !bv) return 0;
+        cmp = av.localeCompare(bv, undefined, { sensitivity: "base" });
       }
       return cmp * dir;
     });
