@@ -43,11 +43,21 @@ const emptyForm: NewClientData = {
 
 function highlightMatch(text: string, query: string) {
   if (!text || !query.trim()) return text || "";
-  const q = query.trim();
-  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  const tokens = Array.from(
+    new Set(
+      query
+        .split(/[\s,;|/]+/)
+        .map((t) => t.trim())
+        .filter(Boolean)
+    )
+  ).sort((a, b) => b.length - a.length);
+  if (tokens.length === 0) return text;
+  const escaped = tokens.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const re = new RegExp(`(${escaped.join("|")})`, "gi");
+  const lowered = tokens.map((t) => t.toLowerCase());
+  const parts = text.split(re);
   return parts.map((part, i) =>
-    part.toLowerCase() === q.toLowerCase() ? (
+    part && lowered.includes(part.toLowerCase()) ? (
       <mark key={i} className="bg-warning/40 text-foreground rounded px-0.5">{part}</mark>
     ) : (
       <span key={i}>{part}</span>
