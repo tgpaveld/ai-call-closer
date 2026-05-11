@@ -170,10 +170,26 @@ export function ClientsTable() {
     processFile(file);
   };
 
+  const markHighlights = (text: string, query: string): string => {
+    if (!text || !query.trim()) return text || "";
+    const tokens = Array.from(
+      new Set(query.split(/[\s,;|/]+/).map((t) => t.trim()).filter(Boolean))
+    ).sort((a, b) => b.length - a.length);
+    if (tokens.length === 0) return text;
+    const escaped = tokens.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const re = new RegExp(`(${escaped.join("|")})`, "gi");
+    return text.replace(re, "[$1]");
+  };
+
   const handleCsvExport = () => {
     const headers = ["first_name", "last_name", "email", "phone", "social_media", "messengers", "status", "comment"];
     const rows = filteredClients.map((c) =>
-      [c.firstName, c.lastName, c.email, c.phone, c.socialMedia, c.messengers, c.status, c.comment]
+      [
+        c.firstName, c.lastName, c.email, c.phone,
+        markHighlights(c.socialMedia, socialMediaQuery),
+        markHighlights(c.messengers, messengersQuery),
+        c.status, c.comment,
+      ]
         .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
         .join(",")
     );
